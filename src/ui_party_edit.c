@@ -1,6 +1,8 @@
-	#include <dhanda/dhanda.h>
+#include <dhanda/dhanda.h>
 #include <dhanda/party.h>
 #include <dhanda/ui.h>
+#include <sys/types.h>
+#include <regex.h>
 
 
 void ui_party_edit(struct dhanda *app)
@@ -29,18 +31,58 @@ void ui_party_edit(struct dhanda *app)
 	printf("AMOUNT     :  %d\n\n", old_party->amount);
 	puts("");
 
+	/*
+	while(1) {
+		printf("FIRST NAME :  ");
+		get_string(new_party->fname, sizeof(new_party->fname));
+		new_party->fname[0] = new_party->fname[0] - ('a' - 'A');
 
-	printf("FIRST NAME :  ");
-	get_string(new_party->fname, sizeof(new_party->fname));
+		if(is_valid(new_party->fname) == -1) {
+			printf("Invalid first name");
+			continue;
+		} else {
+			break;
+		}
+	}
 
-	printf("LAST NAME  :  ");
-	get_string(new_party->lname, sizeof(new_party->lname));
 
-	printf("PHONE      :  ");
-	get_string(new_party->phone, sizeof(new_party->phone));
-	
-	printf("AMOUNT     :  ");
-	scanf("%d", &new_party->amount);
+	while(1) {
+		printf("LAST NAME  :  ");
+		get_string(new_party->lname, sizeof(new_party->lname));
+		new_party->lname[0] = new_party->lname[0] - ('a' - 'A');
+
+		if(is_valid(new_party(lname)) == -1) {
+			printf("Invalid last name");
+			continue;
+		} else {
+			break;
+		}
+	}
+
+	while(1) {
+		printf("PHONE      :  ");
+		get_string(new_party->phone, sizeof(new_party->phone));
+		if(strlen(p.phone) < 10) {
+			printf("Invalid phone number");
+			continue;
+		} else {
+			break;
+		}
+	}
+
+	while(1) {
+		printf("AMOUNT     :  ");
+		char amount[10];
+		get_string(amount, sizeof(amount));
+	    long ret = strtol(amount, NULL, 10);
+
+	    if(ret == 0) {
+	    	printf("Invalid amount input");
+	    	continue;
+	    } else {
+	    	new_party->amount = (int) ret;
+	    	break;
+	    }
+	}
+	*/
 }
-
-

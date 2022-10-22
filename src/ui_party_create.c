@@ -1,6 +1,22 @@
 #include <dhanda/dhanda.h>
 #include <dhanda/party.h>
 #include <dhanda/ui.h>
+#include <sys/types.h>
+#include <regex.h>
+
+
+
+/*void input_valid_string(char *in, size_t size, int (*validator)(char *))
+{
+	while(1) {
+		printf("> ");
+		get_string(in, size);
+		
+		if(validator(in) == 0) break;
+		
+		printf("Invalid input\n");
+	}
+}*/
 
 
 void ui_party_create(struct dhanda *app)
@@ -14,6 +30,12 @@ void ui_party_create(struct dhanda *app)
 	long ret;
 	char s[100];
 	char *ptr;
+	char amount[10];
+
+	//regular expression
+	char *pattern = "^([a-zA-Z]{2, 31})$";
+
+	regex_t rgx;
 
 
 	sky();
@@ -22,22 +44,43 @@ void ui_party_create(struct dhanda *app)
 	printf("\n\n");
 	reset();
 	grey();
+
+	// input_valid_string(p.fname, sizeof(p.fname), validator);
+	// e.g. Input first name
+	// input_valid_string(p.fname, sizeof(p.fname), validate_name);
 	printf("   FIRST NAME :  ");
-	get_string(p.fname, sizeof(p.fname));
-	printf("\n");
+	input_valid_string(p.fname, sizeof(p.fname), validate_name);
+	title_case(p.fname);
+
 	printf("   LAST NAME  :  ");
-	get_string(p.lname, sizeof(p.lname));
-	printf("\n");
+	input_valid_string(p.lname, sizeof(p.lname), validate_name);
+	title_case(p.lname);
+
 	printf("   PHONE      :  ");
-	get_string(p.phone, sizeof(p.phone));
-	
-	printf("\n");
+	input_valid_string(p.phone, sizeof(p.phone), validate_phone);
+
 	printf("  AMOUNT     :  ");
-    scanf("%d",&p.amount);
+	input_amount(&p.amount, validate_amount);
+
+	printf("\n");
+
+
+	time(&p.cat);
+
+
+
+	
 		
 	reset();
 	party_insert_in_list(app, &p);
 
 	puts("");
+
 }
+
+	
+
+
+
+
 

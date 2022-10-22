@@ -18,19 +18,19 @@ void ui_txn_show(struct dhanda *app)
 	printf("\n\n");
 	reset();
 	printf("%-10s %-10s %-10s %-10s %-10s %-10s", "ID", 
-												  "AMOUNT",
-												  "CAT",
+												  "AMOUNT", 
 												  "TYPE",
 												  "PARTY_ID",
+												  "CAT",
 												  "DESC");
 	printf("\n\n");
 	
-	printf("%-10d %-10d %-10ld %-10d %-10d %s\n\n", t->id, 
+	printf("%-10d %-10d %-10d %-10d %s\n\n", t->id, 
 										  t->amount, 
-										  t->cat, 
 										  t->type,
-										  t->party_id,
+										  t->party_id, 
 										  t->desc);
+	created_at(t->cat);
 		
 	
 

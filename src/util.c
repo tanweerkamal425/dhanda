@@ -1,5 +1,4 @@
 #include <dhanda/dhanda.h>
-#include <dhanda/util.h>
 
 int get_line(char line[], int size)
 {
@@ -108,5 +107,205 @@ void print_warning(char *s){
 	printf("%s", s);
 }
 
+
+void created_at(time_t t) 
+{
+	struct tm *tm;
+	char timestr[100];
+
+
+	tm = localtime(&t);
+
+	strftime(timestr, sizeof(timestr), "%Y-%m-%d", tm);
+
+	printf("%s\n", timestr);
+
+}
+
+
+void input_valid_string(char *in, size_t size, int (*validator)(char *))
+{
+	while(1) {
+		printf("> ");
+		get_string(in, size);
+		
+		if(validator(in) == 0) break;
+		
+		printf("Invalid input\n");
+	}
+}
+
+
+int validate_name(char *str)
+{
+	//regular expression
+	char *pattern = "^[a-zA-Z ]{2,31}$";
+	char buf[1024];
+	int err;
+
+	regex_t rgx;
+
+	if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+		// regerror(err, &rgx, buf, sizeof(buf));
+		// printf("%s\n", buf);
+		return -1;
+	}
+
+	if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+		return -1;
+	}
+
+	return 0;
+}
+
+
+int validate_phone(char *str) {
+		//regular expression
+		char *pattern = "^[1-9][0-9]{9}$";
+		char buf[1024];
+		int err;
+
+		regex_t rgx;
+
+		if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+			// regerror(err, &rgx, buf, sizeof(buf));
+			// printf("%s\n", buf);
+			return -1;
+		}
+
+		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+			return -1;
+		}
+
+		return 0;
+	}
+
+
+	void input_amount(int *in, int (*validator)(char *)) {
+		char amount[10];
+
+		while(1) {
+			printf("> ");
+			get_string(amount, 10);
+			
+			if(validator(amount) == 0) {
+				long ret = strtol(amount, NULL, 10);
+				*in = (int) ret;
+				break;
+			}
+		
+			printf("Invalid input\n");
+		}
+
+	}
+
+	int validate_amount(char *str) {
+		//regular expression
+		char *pattern = "^[0-9]{1,10}$";
+		char buf[1024];
+		int err;
+
+		regex_t rgx;
+
+		if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+			 regerror(err, &rgx, buf, sizeof(buf));
+			 printf("%s\n", buf);
+			return -1;
+		}
+
+		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+			return -1;
+		}
+
+		return 0;
+	}
+
+	void title_case(char *str)
+	{
+		str[0] = str[0] - ('a' - 'A');
+	}
+
+
+	void input_pid(dhanda *app, int *pid, int (*validator) (char *))
+	{
+		char pd[10];
+		struct party *result;
+
+		while(1) {
+			printf("> ");
+			get_string(pd, 10);
+			
+			if(validator(pd) == 0) {
+				long ret = strtol(pd, NULL, 10);
+				*pid = (int) ret;
+				if(party_findbyid(app, *pid, result) == 1)
+					break;
+			}
+		
+			printf("Invalid input\n");
+		}
+	}
+
+	int validate_pid(char *str) 
+	{
+		//regular expression
+		char *pattern = "^[0-9]{1,10}$";
+		char buf[1024];
+		int err;
+
+		regex_t rgx;
+
+		if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+			 regerror(err, &rgx, buf, sizeof(buf));
+			 printf("%s\n", buf);
+			return -1;
+		}
+
+		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+			return -1;
+		}
+
+		return 0;
+	}
+
+	void input_txn_type(int *type, int (*validator) (char *))
+	{
+		char t[1];
+
+		while(1) {
+			printf("> ");
+			get_string(t, 1);
+			
+			if(validator(t) == 0) {
+				long ret = strtol(t, NULL, 10);
+				*type = (int) ret;
+				break;
+			}
+		
+			printf("Invalid input\n");
+		}
+	}
+
+	int validate_type(char *str)
+	{
+		//regular expression
+		char *pattern = "^[0-1]{1}$";
+		char buf[1024];
+		int err;
+
+		regex_t rgx;
+
+		if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+			 regerror(err, &rgx, buf, sizeof(buf));
+			 printf("%s\n", buf);
+			return -1;
+		}
+
+		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+			return -1;
+		}
+
+		return 0;
+	}
 
 

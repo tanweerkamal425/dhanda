@@ -1,6 +1,8 @@
 #ifndef _DHANDA_UTIL_H_
 #define _DHANDA_UTIL_H_
 
+#include <dhanda/dhanda.h>
+
 #define ANSI_COLOR_RED      "\x1b[31m"
 #define ANSI_COLOR_GREEN    "\x1b[32m"
 #define ANSI_COLOR_YELLOW   "\x1b[33m"
@@ -37,10 +39,26 @@ void bold();
 void warning();
 void error();
 void success();
-void print_success(char s[100]);
-void print_error(char s[100]);
-void print_warning(char s[100]);
+void print_success(char *s);
+void print_error(char *s);
+void print_warning(char *s);
 
-void centreprint(char s[100]);
+void centreprint(char *s);
+
+int validate_name(char *str);
+int validate_phone(char *str);
+int validate_amount(char *str);
+void input_valid_string(char *in, size_t size, int (*validator)(char *));
+void input_amount(int *in, int (*validator)(char *));
+void title_case(char *str); 
+
+
+void input_pid(dhanda *app, int *pid, int (*validator) (char *));
+int validate_pid(char *str);
+void input_txn_type(int *type, int (*validator) (char *));
+int validate_type(char *str);
+
+
+void created_at(time_t t);
 
 #endif
