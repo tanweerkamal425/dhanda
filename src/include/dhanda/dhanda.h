@@ -16,7 +16,7 @@
 
 
 #include <dhanda/list.h>
-#include <dhanda/util.h>
+
 
 #define MAXLINE 1000
 #define MAXCMDARG 32
@@ -56,6 +56,8 @@ typedef struct dhanda {
 	struct list *party_list;
 	struct list *txn_list;
 } dhanda;
+
+#include <dhanda/util.h>
 
 void dhanda_init_app(dhanda *app);
 void dhanda_app_cleanup(dhanda *app);

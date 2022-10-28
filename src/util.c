@@ -1,4 +1,5 @@
 #include <dhanda/dhanda.h>
+#include <dhanda/party.h>
 
 int get_line(char line[], int size)
 {
