@@ -49,6 +49,7 @@ typedef struct cmdline {
 typedef struct dhanda {
 	FILE *party_fp;
 	FILE *txn_fp;
+	char *error_str;
 	cmdline cmd;
 	enum context context;
 	void (*renderer)(struct dhanda *);
@@ -66,5 +67,7 @@ void dhanda_app_print_helpline(dhanda *app);
 void dhanda_parse_cmd_line(cmdline *cmd);
 void dhanda_app_cmd_handle(dhanda *app);
 void dhanda_app_render(dhanda *app);
+
+void app_error_set(dhanda *app, char *str);
 
 #endif

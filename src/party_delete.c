@@ -22,8 +22,10 @@ int party_delete(dhanda *app, party *party)
 		count++;
 	}
 
-	if (matched == -1)
+	if (matched == -1) {
+		app_error_set(app, "Party not found");
 		return 0;
+	}
 	
 	
 	while(fread(&temp, sizeof(temp), 1, app->party_fp) > 0) {

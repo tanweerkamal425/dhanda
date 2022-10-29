@@ -199,7 +199,8 @@ dhanda_app_print_helpline(dhanda *app)
 	printf("\n");
 	error();
 	reset();
-	print_error("      OPENING ERROR");
+	if (app->error_str)
+		print_error(app->error_str);
 	puts("");
 	start_cmdline_color();
 	printf("> ");
@@ -561,6 +562,12 @@ dhanda_resolve_delete_renderer(dhanda *app)
 		case SCREEN_PARTY: 	app->renderer = ui_party_list; break;
 		default: app->renderer = NULL;
 	}
+}
+
+void
+app_error_set(dhanda *app, char *str)
+{
+	app->error_str = "Some error occured while adding new party";
 }
 
 

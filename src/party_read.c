@@ -18,8 +18,10 @@ int party_findbyid(dhanda *app, int id, party *result)
 			break;
 		}
 	}
-	if (ferror(app->party_fp))
+	if (ferror(app->party_fp)) {
+		app_error_set(app, "Party not found");
 		found = -1;
+	}
 
 	return found;
 }
@@ -44,6 +46,12 @@ int party_search(dhanda *app, char *query, struct list *result)
 		if(!node)
 			break;
 	}
+
+	if(matched == 0) {
+		app_error_set(app, "Party not found");
+		return matched;
+	}
+	
 	return matched;
 	
 }
@@ -72,6 +80,11 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 		
 		if(node == NULL) 
 			break;
+	}
+
+	if(count >= filter.items) {
+		app_error_set(app, "Party not found");
+		return count;
 	}
 	
 	return count;
