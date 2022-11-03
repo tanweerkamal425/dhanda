@@ -567,7 +567,7 @@ dhanda_resolve_delete_renderer(dhanda *app)
 void
 app_error_set(dhanda *app, char *str)
 {
-	app->error_str = "Some error occured while adding new party";
+	app->error_str = str;
 }
 
 
