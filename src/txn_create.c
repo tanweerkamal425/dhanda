@@ -29,6 +29,8 @@ int txn_add(dhanda *app, txn *txn)
 
 	if (init_posn < fin_posn)
 		return 0;
-	else
+	else {
+		app_error_set(app, "Failed to create transaction");
 		return -1;
+	}
 }
