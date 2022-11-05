@@ -23,7 +23,7 @@ int party_delete(dhanda *app, party *party)
 	}
 
 	if (matched == -1) {
-		app_error_set(app, "Party not found");
+		app_error_set(app, strerror(errno));
 		return 0;
 	}
 	
@@ -37,7 +37,10 @@ int party_delete(dhanda *app, party *party)
 
 	fseek(app->party_fp, -sizeof(temp), SEEK_CUR);
 	trunc_size = sizeof(temp) * count;
-	ftruncate(fileno(app->party_fp), trunc_size);
+	if(ftruncate(fileno(app->party_fp), trunc_size) != 0) {
+		app_error_set(app, strerror(errno));
+		return 0;
+	}
 	
 	return matched;
 }

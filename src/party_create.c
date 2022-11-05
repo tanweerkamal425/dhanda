@@ -22,7 +22,7 @@ int party_add(dhanda *app, party *party)
            fseek(app->party_fp, -sizeof(*party), SEEK_END);
            ret1 = fread(&p, sizeof(p), 1, app->party_fp);
            if(ret1 != 1) {
-               app_error_set(app, "error format");
+               app_error_set(app, strerror(errno));
                return -1; 
            }
           new_id = p.id;
@@ -37,7 +37,7 @@ int party_add(dhanda *app, party *party)
       if(ret1 == sizeof(*party) && ret2 == sizeof(*party))
 	    return 0;
       else {
-         app_error_set(app, "error format");
+         app_error_set(app, strerror(errno));
          return -1; 
       }
 	    

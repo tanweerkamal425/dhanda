@@ -93,8 +93,9 @@ int txn_get(dhanda *app, txn_filter filter, struct list *result)
 			break;
 
 		node = list_new_node(result, (void *) &temp);
-		if (node == NULL)
+		if (node == NULL) {
 			break;
+		}
 		list_insert_end(result, node);
 	}
 

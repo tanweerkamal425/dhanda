@@ -19,7 +19,7 @@ int party_findbyid(dhanda *app, int id, party *result)
 		}
 	}
 	if (ferror(app->party_fp)) {
-		app_error_set(app, "Party not found");
+		app_error_set(app, strerror(errno));
 		found = -1;
 	}
 
@@ -48,7 +48,7 @@ int party_search(dhanda *app, char *query, struct list *result)
 	}
 
 	if(matched == 0) {
-		app_error_set(app, "Party not found");
+		app_error_set(app, strerror(errno));
 		return matched;
 	}
 	
@@ -83,7 +83,7 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 	}
 
 	if(count >= filter.items) {
-		app_error_set(app, "Party not found");
+		app_error_set(app, strerror(errno));
 		return count;
 	}
 	
