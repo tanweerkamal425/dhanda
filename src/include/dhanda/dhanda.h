@@ -17,7 +17,6 @@
 
 #include <dhanda/list.h>
 
-
 #define MAXLINE 1000
 #define MAXCMDARG 32
 #define DHANDA_DATA_STORAGE ".dhanda"
