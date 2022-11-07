@@ -13,6 +13,10 @@ int party_findbyid(dhanda *app, int id, party *result)
 	
 	fseek(app->party_fp, 0, SEEK_SET);
 	while((ret = fread(result, sizeof(party), 1, app->party_fp)) > 0) {
+		if (ret != 1) {
+			app_error_set(app, strerror(errno));
+			return -1;
+		}
 		if(id == result->id) {
 			found = 1;
 			break;
