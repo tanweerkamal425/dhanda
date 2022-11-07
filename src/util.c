@@ -58,7 +58,7 @@ void green(){
 }
 void error() {
 	printf("\x1b[37;41m");
-	printf("ERROR:");
+	printf("ERROR: ");
 }
 void success(){
 	printf("\x1b[37;42m");
