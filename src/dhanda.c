@@ -197,10 +197,13 @@ dhanda_app_print_helpline(dhanda *app)
 	else
 		printf("**UNKNOWN SCREEN**\n");
 	printf("\n");
-	error();
+	//error();
 	reset();
-	if (app->error_str)
+	if (app->error_str) {
+		error();
+		reset();
 		print_error(app->error_str);
+	}
 	puts("");
 	start_cmdline_color();
 	printf("> ");
