@@ -46,6 +46,12 @@ int party_search(dhanda *app, char *query, struct list *result)
 			node = list_new_node(result, (void *) &temp);
 			list_insert_end(result, node);
 		}
+
+		if (strstr(temp.fname, query) || strstr(temp.lname, query)) {
+			matched = 1;
+			node = list_new_node(result, (void *) &temp);
+			list_insert_end(result, node);
+		}
 		
 		if(!node)
 			break;
