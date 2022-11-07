@@ -227,7 +227,8 @@ int validate_phone(char *str) {
 
 	void title_case(char *str)
 	{
-		str[0] = str[0] - ('a' - 'A');
+		if (str[0] >= 'a' && str[0] <= 'z')
+				str[0] = str[0] - ('a' - 'A');
 	}
 
 
