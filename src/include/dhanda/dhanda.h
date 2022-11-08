@@ -13,6 +13,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <regex.h>
+#include <ctype.h>
 
 
 #include <dhanda/list.h>

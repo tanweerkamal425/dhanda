@@ -227,15 +227,19 @@ int validate_phone(char *str) {
 
 	void title_case(char *str)
 	{
-		if (str[0] >= 'a' && str[0] <= 'z')
-				str[0] = str[0] - ('a' - 'A');
+		str[0] = toupper(str[0]);
+		for (int i = 1; str[i] != '\0'; ++i) {
+			if (str[i] == ' ') {
+				str[i + 1] = toupper(str[i + 1]);
+			}
+		}
 	}
 
 
 	void input_pid(dhanda *app, int *pid, int (*validator) (char *))
 	{
 		char pd[10];
-		struct party *result;
+		struct party result;
 
 		while(1) {
 			printf("> ");
@@ -244,7 +248,7 @@ int validate_phone(char *str) {
 			if(validator(pd) == 0) {
 				long ret = strtol(pd, NULL, 10);
 				*pid = (int) ret;
-				if(party_findbyid(app, *pid, result) == 1)
+				if(party_findbyid(app, *pid, &result) == 1)
 					break;
 			}
 		
@@ -276,11 +280,11 @@ int validate_phone(char *str) {
 
 	void input_txn_type(int *type, int (*validator) (char *))
 	{
-		char t[1];
+		char t[10];
 
 		while(1) {
 			printf("> ");
-			get_string(t, 1);
+			get_string(t, 10);
 			
 			if(validator(t) == 0) {
 				long ret = strtol(t, NULL, 10);
