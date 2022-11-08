@@ -199,10 +199,14 @@ dhanda_app_print_helpline(dhanda *app)
 	printf("\n");
 	//error();
 	reset();
-	if (app->error_str) {
+	if (app->error) {
 		error();
 		reset();
-		print_error(app->error_str);
+		print_error(app->msg);
+	} else if(app->msg) {
+		success();
+		reset();
+		print_success(app->msg);
 	}
 	puts("");
 	start_cmdline_color();
@@ -570,7 +574,14 @@ dhanda_resolve_delete_renderer(dhanda *app)
 void
 app_error_set(dhanda *app, char *str)
 {
-	app->error_str = str;
+	app->error = true;
+	app->msg = str;
+}
+
+void app_success_set(dhanda *app, char *str)
+{
+	app->error = false;
+	app->msg = str;
 }
 
 
