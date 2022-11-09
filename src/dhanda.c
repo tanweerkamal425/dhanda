@@ -179,6 +179,7 @@ dhanda_app_reset(dhanda *app)
 {
 	list_delete_all(app->party_list);
 	list_delete_all(app->txn_list);
+	app->msg = NULL;
 }
 
 void
@@ -199,14 +200,14 @@ dhanda_app_print_helpline(dhanda *app)
 	printf("\n");
 	//error();
 	reset();
-	if (app->error) {
+	if (app->error &&  app->msg) {
 		error();
 		reset();
 		print_error(app->msg);
-	} else if(app->msg) {
+	} else if(!app->error && app->msg) {
 		success();
 		reset();
-		print_success(app->msg);
+		print_success(app->msg);	
 	}
 	puts("");
 	start_cmdline_color();
