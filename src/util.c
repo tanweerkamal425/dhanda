@@ -58,11 +58,15 @@ void green(){
 }
 void error() {
 	printf("\x1b[37;41m");
-	printf("ERROR: ");
+	printf("ERROR:");
+	reset();
+	printf(" ");
 }
 void success(){
 	printf("\x1b[37;42m");
 	printf("SUCCESS:");
+	reset();
+	printf(" ");
 }
 void warning(){
 	yellow();
