@@ -26,5 +26,7 @@ int party_update(dhanda *app, party *old_party, struct party *new_party)
 		return -1;
 	}
 
+	app_success_set(app, "Party updated successfully");
+	
 	return 0;
  }		 

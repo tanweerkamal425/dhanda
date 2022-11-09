@@ -4,14 +4,17 @@
 int txn_add(dhanda *app, txn *txn)
 {
 	struct txn temp;
-	int init_posn, fin_posn, txn_id;
+	int init_posn, fin_posn, txn_id, ret;
 	debug_print("");
 
 	fseek(app->txn_fp, 0, SEEK_END);
-	init_posn = ftell(app->txn_fp);
-	if (init_posn) {
+	if (ftell(app->txn_fp)) {
 		fseek(app->txn_fp, -sizeof(*txn), SEEK_END);
-		fread(&temp, sizeof(*txn), 1, app->txn_fp);
+		ret = fread(&temp, sizeof(*txn), 1, app->txn_fp);
+		if (ret != 1) {
+			app_error_set(app, strerror(errno));
+			return -1;
+		}
 		txn_id = temp.id;
 		txn_id++;
 	} else {
@@ -21,16 +24,12 @@ int txn_add(dhanda *app, txn *txn)
 	txn->id = txn_id;
 
 	init_posn = ftell(app->txn_fp);
-	fwrite(txn, sizeof(*txn), 1, app->txn_fp);
-	fin_posn = ftell(app->txn_fp);
-
-
-
-
-	if (init_posn < fin_posn)
-		return 0;
-	else {
+	ret = fwrite(txn, sizeof(*txn), 1, app->txn_fp);
+	if (ret != 1) {
 		app_error_set(app, strerror(errno));
 		return -1;
 	}
+
+	app_success_set(app, "Transaction added successfully");
+	return 0;
 }

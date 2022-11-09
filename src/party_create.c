@@ -11,8 +11,6 @@ int party_add(dhanda *app, party *party)
       // app_error_set(app, "error format");
       
 
-      int cur_pos = 0 , final_pos = 0;
-
       debug_print("");
 
       fseek(app->party_fp, 0, SEEK_END);
@@ -30,16 +28,14 @@ int party_add(dhanda *app, party *party)
      }
       party->id = new_id;
 
-      cur_pos = ftell(app->party_fp);
       ret2 = fwrite(party, sizeof(*party), 1, app->party_fp);
-      final_pos = ftell(app->party_fp);
-
-      if(ret1 == sizeof(*party) && ret2 == sizeof(*party))
-	    return 0;
-      else {
+      if (ret2 != 1) {
          app_error_set(app, strerror(errno));
          return -1; 
-      }
+     }
+
+      app_success_set(app, "Party added successfully");
+      return 0;
 	    
 }
 

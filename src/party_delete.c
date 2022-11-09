@@ -42,6 +42,7 @@ int party_delete(dhanda *app, party *party)
 		return 0;
 	}
 	
+	app_success_set(app, "Party deleted successfully");
 	return matched;
 }
 			

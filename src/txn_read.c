@@ -89,12 +89,15 @@ int txn_get(dhanda *app, txn_filter filter, struct list *result)
 
 	fseek(app->txn_fp, 0, SEEK_SET);
 	while (fread(&temp, sizeof(temp), 1, app->txn_fp) > 0) {
-		if (count >= filter.items)
-			break;
+		if (count >= filter.items) {
+			app_error_set(app, strerror(errno));
+			return -1;
+		}
 
 		node = list_new_node(result, (void *) &temp);
 		if (node == NULL) {
-			break;
+			app_error_set(app, strerror(errno));
+			return -1;
 		}
 		list_insert_end(result, node);
 	}
