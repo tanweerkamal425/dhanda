@@ -5,11 +5,7 @@ int party_add(dhanda *app, party *party)
 {
       struct party p;
       int new_id;
-      int ret1, ret2;
-
-      //app->error_str = "Some error occured while adding new party";
-      // app_error_set(app, "error format");
-      
+      int ret1, ret2;      
 
       debug_print("");
 

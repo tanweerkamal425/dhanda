@@ -21,10 +21,7 @@
 
 void ui_party_create(struct dhanda *app)
 {
-	/*long int phone = 9748538411,
-		amount = 10000;
-	char fname[64] = "Safwan", lname[64] = "Haider";
-	*/
+
 	party p;
 	int len;
 	long ret;
@@ -45,9 +42,7 @@ void ui_party_create(struct dhanda *app)
 	reset();
 	grey();
 
-	// input_valid_string(p.fname, sizeof(p.fname), validator);
-	// e.g. Input first name
-	// input_valid_string(p.fname, sizeof(p.fname), validate_name);
+
 	printf("   FIRST NAME :  ");
 	input_valid_string(p.fname, sizeof(p.fname), validate_name);
 	title_case(p.fname);
@@ -67,10 +62,7 @@ void ui_party_create(struct dhanda *app)
 
 	time(&p.cat);
 
-
-
 	
-		
 	reset();
 	party_insert_in_list(app, &p);
 
