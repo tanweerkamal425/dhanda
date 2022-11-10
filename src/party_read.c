@@ -45,21 +45,21 @@ int party_search(dhanda *app, char *query, struct list *result)
 		if(strstr(temp.phone, query)) {
 			matched = 1;
 			node = list_new_node(result, (void *) &temp);
+			assert(node != NULL);
 			list_insert_end(result, node);
 		}
 
 		else if (strstr(temp.fname, query) || strstr(temp.lname, query)) {
 			matched = 1;
 			node = list_new_node(result, (void *) &temp);
+			assert(node != NULL);
 			list_insert_end(result, node);
 		}
 		
-		if(!node)
-			break;
 	}
 
 	if(matched == 0) {
-		app_error_set(app, strerror(errno));
+		app_error_set(app, "Party not found");
 		return matched;
 	}
 
