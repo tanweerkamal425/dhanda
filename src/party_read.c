@@ -100,7 +100,6 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 		return count;
 	}
 	
-	app_success_set(app, "Party found");
 
 	return count;
 }
