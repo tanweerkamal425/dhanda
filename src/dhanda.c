@@ -423,6 +423,10 @@ dhanda_command_edit(dhanda *app)
 				return;
 			}
 
+			party *ptr;
+			ptr = party_first_in_list(app);
+			*ptr = *new_party;
+
 			break;
 		/* @NOTE Edit for TXN is not allowed */
 		default:
