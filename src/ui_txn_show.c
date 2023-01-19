@@ -29,18 +29,6 @@ void ui_txn_show(struct dhanda *app)
 										  t->type,
 										  t->party_id, 
 										  t->desc);
-	
-		
-	
-
-	  /*printf("PARTY TRANSACTION......\n\n");
-		printf("NAME       TXN        DEBIT      CREDIT     ");
-		printf("\n\n");
-		printf("\n\n");
-		printf("%-10d %-10d %-10d %-10d", id2, txn2, debit2, credit2);
-		printf("\n\n");
-		printf("%-10d %-10d %-10d %-10d", id3, txn3, debit3, credit3);
-			puts("");*/
 
 }
 
