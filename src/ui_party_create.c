@@ -6,19 +6,6 @@
 
 
 
-/*void input_valid_string(char *in, size_t size, int (*validator)(char *))
-{
-	while(1) {
-		printf("> ");
-		get_string(in, size);
-		
-		if(validator(in) == 0) break;
-		
-		printf("Invalid input\n");
-	}
-}*/
-
-
 void ui_party_create(struct dhanda *app)
 {
 
