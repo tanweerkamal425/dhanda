@@ -231,12 +231,43 @@ int validate_phone(char *str) {
 
 	void title_case(char *str)
 	{
+		unispace_separate(str);
 		str[0] = toupper(str[0]);
 		for (int i = 1; str[i] != '\0'; ++i) {
 			if (str[i] == ' ') {
 				str[i + 1] = toupper(str[i + 1]);
 			}
 		}
+	}
+
+	void unispace_separate(char *str) 
+	{
+		int i = 0;
+
+		char last = 'a';
+		char res[strlen(str)];
+
+		res[0] = '\0';
+
+		while (str[i] == ' ') {
+			i++;
+		}
+
+		while (str[i] != '\0') {
+			char ch = str[i];
+			if (ch != ' ') {
+				strncat(res, &ch, 1);
+			} else if(last != ' ') {
+				strncat(res, &ch, 1);
+			}
+
+			last = ch;
+			i++;
+		}
+
+		strcpy(str, res);
+
+
 	}
 
 

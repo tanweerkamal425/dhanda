@@ -50,7 +50,8 @@ int validate_phone(char *str);
 int validate_amount(char *str);
 void input_valid_string(char *in, size_t size, int (*validator)(char *));
 void input_amount(int *in, int (*validator)(char *));
-void title_case(char *str); 
+void title_case(char *str);
+void unispace_separate(char *str); 
 
 
 void input_pid(dhanda *app, int *pid, int (*validator) (char *));
