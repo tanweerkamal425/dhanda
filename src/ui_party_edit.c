@@ -48,7 +48,7 @@ void ui_party_edit(struct dhanda *app)
 
 	printf("\n");
 
-
-	time(&new_party->cat);
+	printf("Added in time function\n");
+	time(&new_party->uat);
 
 }

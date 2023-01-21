@@ -61,5 +61,6 @@ int validate_type(char *str);
 
 
 void created_at(time_t t);
+void updated_at(time_t t);
 
 #endif

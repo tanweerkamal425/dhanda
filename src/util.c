@@ -62,13 +62,13 @@ void error() {
 	reset();
 	printf(" ");
 }
-void success(){
+void success() {
 	printf("\x1b[37;42m");
 	printf("SUCCESS:");
 	reset();
 	printf(" ");
 }
-void warning(){
+void warning() {
 	yellow();
 	printf("WARNING:");
 }
@@ -125,7 +125,21 @@ void created_at(time_t t)
 
 	tm = localtime(&t);
 
-	strftime(timestr, sizeof(timestr), "%Y-%m-%d", tm);
+	strftime(timestr, sizeof(timestr), "%Y-%m-%d %T", tm);
+
+	printf("%s\n", timestr);
+
+}
+
+void updated_at(time_t t)
+{
+	struct tm *tm;
+	char timestr[100];
+
+
+	tm = localtime(&t);
+
+	strftime(timestr, sizeof(timestr), "%Y-%m-%d %T", tm);
 
 	printf("%s\n", timestr);
 
@@ -258,7 +272,7 @@ int validate_phone(char *str) {
 			if (ch != ' ') {
 				strncat(res, &ch, 1);
 			} else if(last != ' ') {
-				strncat(res, &ch, 1);
+					strncat(res, &ch, 1);
 			}
 
 			last = ch;
@@ -266,7 +280,6 @@ int validate_phone(char *str) {
 		}
 
 		strcpy(str, res);
-
 
 	}
 
@@ -343,12 +356,12 @@ int validate_phone(char *str) {
 		if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
 			 regerror(err, &rgx, buf, sizeof(buf));
 			 printf("%s\n", buf);
-			return -1;
+			 return -1;
 		}
 
 		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
 			return -1;
-		}
+		}	
 
 		return 0;
 	}

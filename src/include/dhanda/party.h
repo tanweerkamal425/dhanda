@@ -10,6 +10,7 @@ typedef struct party {
 	char phone[12];
 	int amount;
 	time_t cat;
+	time_t uat;
 } party;
 
 typedef struct party_filter {

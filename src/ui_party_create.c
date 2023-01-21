@@ -48,6 +48,7 @@ void ui_party_create(struct dhanda *app)
 
 
 	time(&p.cat);
+	time(&p.uat);
 
 	
 	reset();
