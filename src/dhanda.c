@@ -459,7 +459,10 @@ dhanda_command_delete(dhanda *app)
 			}
 			party_insert_in_list(app, &p);
 			ui_party_delete(app);
-			ret = party_delete(app, &p);
+			// printf("%d\n", p.deletion_confirmed);
+			if (p.deletion_confirmed == 0) {
+				ret = party_delete(app, &p);
+			}
 			if (ret == -1) {
 				fprintf(stderr, "party_delete error\n");
 				return;

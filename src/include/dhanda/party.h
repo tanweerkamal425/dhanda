@@ -11,6 +11,7 @@ typedef struct party {
 	int amount;
 	time_t cat;
 	time_t uat;
+	int deletion_confirmed;
 } party;
 
 typedef struct party_filter {

@@ -30,6 +30,8 @@ void ui_party_show(struct dhanda *app)
 	printf("\n\n");
 
 	printf("   PHONE NO   : %s               \n\n", p->phone);
+
+	printf("   AMOUNT	  : %d               \n\n", p->amount);
 	
 	printf("   CREATED AT : ");
 	created_at(p->cat);

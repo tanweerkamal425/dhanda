@@ -42,6 +42,7 @@ void success();
 void print_success(char *s);
 void print_error(char *s);
 void print_warning(char *s);
+void confirmation();
 
 void centreprint(char *s);
 

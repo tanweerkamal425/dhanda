@@ -73,6 +73,11 @@ void warning() {
 	printf("WARNING:");
 }
 
+void confirmation() {
+	red();
+	printf("Do you want to delete [y/n]?: ");
+}
+
 
 //CENTRE PRINTING FUNCTION
 
