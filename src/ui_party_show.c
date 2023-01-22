@@ -21,7 +21,8 @@ void ui_party_show(struct dhanda *app)
 	printf("\n\n");
 	reset();
 
-	grey();
+	// grey();
+	printf("\x1b[95m");
 	printf("   ID NO      : %d               \n\n", p->id);
 
 	printf("   FIRST NAME : %s               ", p->fname);
@@ -31,10 +32,12 @@ void ui_party_show(struct dhanda *app)
 
 	printf("   PHONE NO   : %s               \n\n", p->phone);
 
-	printf("   AMOUNT	  : %d               \n\n", p->amount);
+	printf("   AMOUNT     : %d               \n\n", p->amount);
 	
 	printf("   CREATED AT : ");
 	created_at(p->cat);
+
+	printf("\n");
 
 	printf("   UPDATED AT : ");
 	updated_at(p->uat);

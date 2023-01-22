@@ -14,7 +14,8 @@ void ui_party_list(struct dhanda *app)
 	centreprint("DHANDA > PARTY > LIST");
 	printf("\n\n");
 	reset();
-	grey();
+	// grey();
+	yellow_fg();
 
 	printf("   %-13s %-20s %-20s %-15s %-10s\n\n\n", "ID", "FIRST NAME", "LAST NAME", "AMOUNT", "PHONE");
 	reset();

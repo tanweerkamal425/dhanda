@@ -56,6 +56,14 @@ void bold(){
 void green(){
 	printf("\x1b[30;42m");
 }
+
+void yellow_fg() {
+	printf("\x1b[33m");
+}
+
+void magenta_fg() {
+	printf("\x1b[95m");
+}
 void error() {
 	printf("\x1b[37;41m");
 	printf("ERROR:");

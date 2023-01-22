@@ -33,6 +33,8 @@ int get_string(char line[], int size);
 void sky();
 void red();
 void yellow();
+void yellow_fg();
+void magenta_fg();
 void reset ();
 void grey();
 void bold();

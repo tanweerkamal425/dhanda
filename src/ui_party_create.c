@@ -27,7 +27,6 @@ void ui_party_create(struct dhanda *app)
 	centreprint("DHANDA > PARTY > CREATE");
 	printf("\n\n");
 	reset();
-	grey();
 
 
 	printf("   FIRST NAME :  ");
