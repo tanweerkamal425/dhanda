@@ -461,7 +461,11 @@ dhanda_command_delete(dhanda *app)
 			ui_party_delete(app);
 			// printf("%d\n", p.deletion_confirmed);
 			if (p.deletion_confirmed == 0) {
+				ret = txn_delete(app, p.id);
 				ret = party_delete(app, &p);
+				// if (ret == 0) {
+				// 	ret = party_delete(app, &p);
+				// }
 			}
 			if (ret == -1) {
 				fprintf(stderr, "party_delete error\n");
