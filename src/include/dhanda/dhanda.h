@@ -1,6 +1,8 @@
 #ifndef _DHANDA_H_
 #define _DHANDA_H_
 
+#define _XOPEN_SOURCE
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -18,12 +20,12 @@
 
 
 #include <dhanda/list.h>
+#include <dhanda/sqlite3.h>
 
 #define MAXLINE 1000
 #define MAXCMDARG 32
 #define DHANDA_DATA_STORAGE ".dhanda"
-#define DHANDA_PARTY_DB_FILE "party.db"
-#define DHANDA_TXN_DB_FILE "txn.db"
+#define DHANDA_DB_FILE "dhanda.db"
 
 enum context {
 	SCREEN_HOME = 1,
@@ -48,8 +50,7 @@ typedef struct cmdline {
 } cmdline;
 
 typedef struct dhanda {
-	FILE *party_fp;
-	FILE *txn_fp;
+	sqlite3 *db;
 	bool error;
 	char *msg;
 	cmdline cmd;

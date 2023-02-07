@@ -3,32 +3,27 @@
 
 int party_add(dhanda *app, party *party)
 {
-      struct party p;
-      int new_id;
-      int ret1, ret2;      
+      char sql[1024];
+      char *err = NULL;
+      int ret;
 
-      debug_print("");
+      char *cat = created_time(party->cat);
+      char *uat = updated_time(party->uat);
 
-      fseek(app->party_fp, 0, SEEK_END);
-      if(!ftell(app->party_fp)) {
-           new_id = 1; 
-      }else{
-           fseek(app->party_fp, -sizeof(*party), SEEK_END);
-           ret1 = fread(&p, sizeof(p), 1, app->party_fp);
-           if(ret1 != 1) {
-               app_error_set(app, strerror(errno));
-               return -1; 
-           }
-          new_id = p.id;
-          new_id++; 
-     }
-      party->id = new_id;
+      sprintf(sql, "INSERT INTO parties(first_name, last_name, phone, amount, created_at, updated_at) VALUES('%s','%s', '%s', '%d', '%s', '%s')", party->fname,
+                                                                                                                                                  party->lname,
+                                                                                                                                                  party->phone,
+                                                                                                                                                  party->amount,
+                                                                                                                                                  cat,
+                                                                                                                                                  uat);
 
-      ret2 = fwrite(party, sizeof(*party), 1, app->party_fp);
-      if (ret2 != 1) {
-         app_error_set(app, strerror(errno));
-         return -1; 
-     }
+      ret = sqlite3_exec(app->db, sql, NULL, NULL, &err);
+      if (ret != SQLITE_OK) {
+        fprintf(stderr, "sqlite3_exec error: %s\n", err);
+        app_error_set(app, "Failed to add party");
+        return -1;
+      }
+
 
       app_success_set(app, "Party added successfully");
       return 0;

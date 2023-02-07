@@ -5,45 +5,23 @@
 
 
 
-int party_delete(dhanda *app, party *party)
-{
-	struct party temp;
-	int matched = -1;
-	int trunc_size, count = 0;
+int party_delete(dhanda *app, party *party)	/*returns 1 for success*/
+{											/*returns -1 for failure*/
 
-	debug_print("");
-	
-	fseek(app->party_fp, 0, SEEK_SET);
-	while(fread(&temp, sizeof(temp), 1, app->party_fp) > 0) {
-		if(party->id == temp.id) {
-			matched = 0;	
-			break;
-		}
-		count++;
+	int ret;
+	char sql[1024];
+	char *err = NULL;
+
+	sprintf(sql, "DELETE FROM parties WHERE id = '%d'", party->id);
+
+	ret = sqlite3_exec(app->db, sql, NULL, NULL, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
 	}
 
-	if (matched == -1) {
-		app_error_set(app, strerror(errno));
-		return 0;
-	}
-	
-	
-	while(fread(&temp, sizeof(temp), 1, app->party_fp) > 0) {
-		fseek(app->party_fp, sizeof(temp) * -2, SEEK_CUR);
-		fwrite(&temp, sizeof(temp), 1, app->party_fp);
-		fseek(app->party_fp, sizeof(temp), SEEK_CUR);
-		count++;
-	}
-
-	fseek(app->party_fp, -sizeof(temp), SEEK_CUR);
-	trunc_size = sizeof(temp) * count;
-	if(ftruncate(fileno(app->party_fp), trunc_size) != 0) {
-		app_error_set(app, strerror(errno));
-		return 0;
-	}
-	
 	app_success_set(app, "Party deleted successfully");
-	return matched;
+	return 0;
 }
 			
 	

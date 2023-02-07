@@ -5,14 +5,8 @@
 
 void ui_party_show(struct dhanda *app)
 {
-	int id;
 	party *p;
-	char fname[32];
-	char lname[32];
-	char phone[12];
-	int amount;
 
-	debug_print("");
 	p = party_first_in_list(app);
 
 	sky();

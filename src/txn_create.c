@@ -3,32 +3,25 @@
 
 int txn_add(dhanda *app, txn *txn)
 {
-	struct txn temp;
-	int init_posn, fin_posn, txn_id, ret;
-	debug_print("");
+	char sql[1024];
+	char *err = NULL;
+	int ret;
 
-	fseek(app->txn_fp, 0, SEEK_END);
-	if (ftell(app->txn_fp)) {
-		fseek(app->txn_fp, -sizeof(*txn), SEEK_END);
-		ret = fread(&temp, sizeof(*txn), 1, app->txn_fp);
-		if (ret != 1) {
-			app_error_set(app, strerror(errno));
-			return -1;
-		}
-		txn_id = temp.id;
-		txn_id++;
-	} else {
-		txn_id = 1;
-	}
+	char *cat = created_time(txn->cat);
 
-	txn->id = txn_id;
-
-	init_posn = ftell(app->txn_fp);
-	ret = fwrite(txn, sizeof(*txn), 1, app->txn_fp);
-	if (ret != 1) {
-		app_error_set(app, strerror(errno));
+	sprintf(sql, "INSERT INTO transactions(amount, created_at, type, desc, party_id) VALUES(%d, '%s', %d, '%s', %d)", txn->amount, 
+																															cat, 
+																															txn->type, 
+																															txn->desc, 
+																															txn->party_id);
+																
+	ret = sqlite3_exec(app->db, sql, NULL, NULL, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		app_error_set(app, "Failed to add transaction");
 		return -1;
 	}
+
 
 	app_success_set(app, "Transaction added successfully");
 	return 0;

@@ -6,27 +6,30 @@ void ui_txn_list(struct dhanda *app)
 {
 	Node *temp;
 	txn *t;
-	debug_print("");
+	char cat[32];
 
 	sky();
 	bold();
 	centreprint("DHANDA > TRANSACTION > LIST");
 	printf("\n\n");
 	reset();
-	printf("   ID         PARTY_ID            AMOUNT          DEBIT/CREDIT(D/C)\n");
-	printf("\n\n");
+
+	blue_fg();
+	printf("   %-10s %-10s %-15s %-20s %-20s\n\n\n", "ID", "PARTY_ID", "AMOUNT", "DEBIT/CREDIT(D/C)", "CREATED_AT");
+	reset();
 
 	temp = app->txn_list->head;
 	while(temp != NULL)
 	{	
 		t = (txn *)temp->data;
-         	printf("   %-10d %-19d %-15d %-15d\n\n",
-			       	t->id,
-				t->party_id,
-			       	t->amount,
-			       	t->type);
+		strcpy(cat, created_time(t->cat));
+        printf("   %-10d %-10d %-15d %-20d %-20s\n\n",	t->id,
+														t->party_id,
+												       	t->amount,
+												       	t->type,
+												       	cat);
 
-		temp = temp->next;
+        temp = temp->next;
 	}
 
 }

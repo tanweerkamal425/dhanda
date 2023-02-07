@@ -35,6 +35,7 @@ void red();
 void yellow();
 void yellow_fg();
 void magenta_fg();
+void blue_fg();
 void reset ();
 void grey();
 void bold();
@@ -61,6 +62,15 @@ void input_pid(dhanda *app, int *pid, int (*validator) (char *));
 int validate_pid(char *str);
 void input_txn_type(int *type, int (*validator) (char *));
 int validate_type(char *str);
+int check_func_call(void *ptr, int ncols, char **values, char **fields);
+char *created_time(time_t t);
+char *updated_time(time_t t);
+int put_in_party_struct(void *ptr, int ncols, char **values, char **fields);
+int put_in_txn_struct(void *ptr, int ncols, char **values, char **fields);
+int put_in_txn_list(void *ptr, int ncols, char **values, char **fields);
+time_t unix_time(char *timestr);
+
+
 
 
 void created_at(time_t t);

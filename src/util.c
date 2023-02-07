@@ -1,5 +1,6 @@
 #include <dhanda/dhanda.h>
 #include <dhanda/party.h>
+#include <dhanda/txn.h>
 
 int get_line(char line[], int size)
 {
@@ -64,6 +65,12 @@ void yellow_fg() {
 void magenta_fg() {
 	printf("\x1b[95m");
 }
+
+void blue_fg() {
+	printf("\x1b[94m");
+}
+
+
 void error() {
 	printf("\x1b[37;41m");
 	printf("ERROR:");
@@ -144,6 +151,18 @@ void created_at(time_t t)
 
 }
 
+char *created_time(time_t t)
+{
+	struct tm *tm;
+	char *timestr = malloc(sizeof(char) * 128);
+
+	tm = localtime(&t);
+
+	strftime(timestr, 128, "%Y-%m-%d %T", tm);
+
+	return timestr;
+}
+
 void updated_at(time_t t)
 {
 	struct tm *tm;
@@ -156,6 +175,20 @@ void updated_at(time_t t)
 
 	printf("%s\n", timestr);
 
+}
+
+
+char *updated_time(time_t t)
+{
+	struct tm *tm;
+	
+	char *timestr = malloc(sizeof(char) * 128);
+
+	tm = localtime(&t);
+
+	strftime(timestr, 128, "%Y-%m-%d %T", tm);
+
+	return timestr;
 }
 
 
@@ -300,7 +333,7 @@ int validate_phone(char *str) {
 	void input_pid(dhanda *app, int *pid, int (*validator) (char *))
 	{
 		char pd[10];
-		struct party result;
+		struct party result = {};
 
 		while(1) {
 			printf("> ");
@@ -311,6 +344,8 @@ int validate_phone(char *str) {
 				*pid = (int) ret;
 				if(party_findbyid(app, *pid, &result) == 1)
 					break;
+				else
+					printf("Party does not exist\n");
 			}
 		
 			printf("Invalid input\n");
@@ -377,6 +412,26 @@ int validate_phone(char *str) {
 		}	
 
 		return 0;
+	}
+
+
+	int check_func_call(void *ptr, int ncols, char **values, char **fields)
+	{
+		*((int *) ptr) = 1;
+
+		return SQLITE_OK;
+	}
+
+
+	time_t unix_time(char *timestr)
+	{
+		struct tm tm;
+
+		strptime(timestr, "%Y-%m-%d %T", &tm);
+
+		time_t t = mktime(&tm);
+		
+		return t;
 	}
 
 
