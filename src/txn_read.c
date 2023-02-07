@@ -26,7 +26,9 @@ int txn_search(dhanda *app, char *query, struct list *result)/*returns 1 if foun
 	char *err = NULL;
 	char sql[1024];
 
-	sprintf(sql, "SELECT * FROM transactions WHERE phone = '%s'", query);
+	int pid = atoi(query);
+
+	sprintf(sql, "SELECT * FROM transactions WHERE party_id = %d", pid);
 
 	ret = sqlite3_exec(app->db, sql, put_in_txn_list, (void *) result, &err);
 	if (ret != SQLITE_OK) {
