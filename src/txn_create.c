@@ -23,6 +23,8 @@ int txn_add(dhanda *app, txn *txn)
 	}
 
 
+	txn->id = sqlite3_last_insert_rowid(app->db);
+
 	app_success_set(app, "Transaction added successfully");
 	return 0;
 }

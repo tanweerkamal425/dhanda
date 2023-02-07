@@ -38,7 +38,9 @@ int party_search(dhanda *app, char *query, struct list *result)/*returns 1 if fo
 	char *err = NULL;
 	int is_found = 0;
 
-	sprintf(sql, "SELECT * FROM parties WHERE phone = '%s'", query);
+	sprintf(sql, "SELECT * FROM parties WHERE phone LIKE '%%%s%%' OR first_name LIKE '%%%s%%'",
+		query,
+		query);
 
 	ret = sqlite3_exec(app->db, sql, put_in_party_list, (void *) result, &err);
 	if (ret != SQLITE_OK) {
