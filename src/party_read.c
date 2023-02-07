@@ -14,13 +14,14 @@ int party_findbyid(dhanda *app, int id, party *result) /*returns 1 if found*/
 
 	sprintf(sql, "SELECT * FROM parties WHERE id = %d", id);
 
+	result->id = 0;
 	ret = sqlite3_exec(app->db, sql, put_in_party_struct, (void *) result, &err);
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "sqlite_exec: %s\n", err);
 		return -1;
 	}
 
-	if (!result) {
+	if (result->id == 0) {
 		app_error_set(app, "Party not found");
 		return 0;
 	}
