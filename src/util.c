@@ -425,7 +425,7 @@ int validate_phone(char *str) {
 
 	time_t unix_time(char *timestr)
 	{
-		struct tm tm;
+		struct tm tm = {};
 
 		strptime(timestr, "%Y-%m-%d %T", &tm);
 
