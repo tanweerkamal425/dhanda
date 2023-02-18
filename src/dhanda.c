@@ -57,6 +57,9 @@ static struct {
 
 static int quit;
 
+
+#if defined(TERMINAL_APP)
+
 int main(int argc, char *argv[])
 {
 	int len;
@@ -100,6 +103,8 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+#endif
+
 void
 dhanda_init_app(struct dhanda *app)
 {
@@ -107,13 +112,13 @@ dhanda_init_app(struct dhanda *app)
 	struct stat buf;
 	struct passwd *pw;
 	char base_path[256], db_filepath[256];
-	
 
 	/* Setup data storage directory (in user's home dir) */
 	if ((pw = getpwuid(getuid())) == NULL) {
 		perror("getpwuid error");
 		exit(EXIT_FAILURE);
 	}
+	fprintf(stderr, "OK1\n");
 	/* @DANGEROUS BUFFER OVERFLOW upto below */
 	strcpy(base_path, pw->pw_dir);
 	strcat(base_path, "/");

@@ -1,5 +1,6 @@
 CC=gcc
 CFLAGS+=-Isrc/include
+CFLAGS+=-DTERMINAL_APP
 
 EXECUTABLE=dhanda
 DBDIR=~/.dhanda
