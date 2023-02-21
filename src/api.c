@@ -56,13 +56,13 @@ api_party_add(struct http_request *req)
 
 	party_add(&app, &p);
 
-	struct kore_json res_json;
+	struct kore_json_item *res_json;
 	struct kore_buf buf;
-	party_struct_to_korejson(&p, &res_json);
+	res_json = party_struct_to_korejson(&p);
 
 
 	kore_buf_init(&buf, 512);
-	kore_json_item_tobuf(res_json.root, &buf);
+	kore_json_item_tobuf(res_json, &buf);
 
 	http_response(req, 201, buf.data, buf.offset);
 
@@ -71,9 +71,77 @@ api_party_add(struct http_request *req)
 
 cleanup:
 	kore_json_cleanup(&json);
-	kore_json_item_free(res_json.root);
+	kore_json_item_free(res_json);
 
 	return KORE_RESULT_OK;
+}
+
+
+int
+api_party_get(struct http_request *req)
+{
+	struct list *result;
+	party_filter filter = {};
+	struct kore_json json = {};
+	struct kore_buf buf;
+
+	http_populate_get(req);
+
+	result = list_create(sizeof(struct party));
+	party_get(&app, filter, result);
+	json.root = party_list_to_korejson(result);
+
+	kore_buf_init(&buf, 512);
+	kore_json_item_tobuf(json.root, &buf);
+
+	http_response(req, 200, buf.data, buf.offset);
+
+	return KORE_RESULT_OK;
+
+}
+
+struct kore_json_item *
+party_list_to_korejson(struct list *parties)
+{
+	Node *ptr;
+	struct party *party_ptr;
+	struct kore_json_item *root, *item, *array;
+
+	root = kore_json_create_object(NULL, NULL);
+
+	array = kore_json_create_array(root, "parties");
+
+	ptr = parties->head;
+
+	while (ptr) {
+		party_ptr = (struct party *) ptr->data;
+		item = party_struct_to_korejson(party_ptr);
+		kore_json_item_attach(array, item);
+
+		ptr = ptr->next;
+	}
+
+	return root;
+	
+}
+
+
+struct kore_json_item *
+party_struct_to_korejson(struct party *p)
+{
+	struct kore_json_item *result, *item;
+	
+	result = kore_json_create_object(NULL, NULL);
+
+	item = kore_json_create_integer(result, "id", p->id);
+	item = kore_json_create_string(result, "first_name", p->fname);
+	item = kore_json_create_string(result, "last_name", p->lname);
+	item = kore_json_create_string(result, "phone", p->phone);
+	item = kore_json_create_integer(result, "amount", p->amount);
+	item = kore_json_create_integer_u64(result, "cat", p->cat);
+	item = kore_json_create_integer_u64(result, "uat", p->uat);
+
+	return result;
 }
 
 
@@ -107,49 +175,37 @@ api_txn_add(struct http_request *req)
 
 	txn_add(&app, &t);
 
-	struct kore_json res_json;
+	struct kore_json_item *res_json;
 	struct kore_buf buf;
-	txn_struct_to_korejson(&t, &res_json);
+	res_json = txn_struct_to_korejson(&t);
 
 	kore_buf_init(&buf, 512);
-	kore_json_item_tobuf(res_json.root, &buf);
+	kore_json_item_tobuf(res_json, &buf);
 
 	http_response(req, 201, buf.data, buf.offset);
 
 
 cleanup:
 	kore_json_cleanup(&json);
-	kore_json_item_free(res_json.root);
+	kore_json_item_free(json.root);
 
 	return KORE_RESULT_OK;
 }
 
 
-void party_struct_to_korejson(struct party *p, struct kore_json *json)
+
+struct kore_json_item *txn_struct_to_korejson(struct txn *t)
 {
-	struct kore_json_item *item;
-	json->root = kore_json_create_object(NULL, NULL);
+	struct kore_json_item *result, *item;
+	
+	result = kore_json_create_object(NULL, NULL);
 
-	item = kore_json_create_integer(json->root, "id", p->id);
-	item = kore_json_create_string(json->root, "first_name", p->fname);
-	item = kore_json_create_string(json->root, "last_name", p->lname);
-	item = kore_json_create_string(json->root, "phone", p->phone);
-	item = kore_json_create_integer(json->root, "amount", p->amount);
-	item = kore_json_create_integer_u64(json->root, "cat", p->cat);
-	item = kore_json_create_integer_u64(json->root, "uat", p->uat);
+	item = kore_json_create_integer(result, "party_id", t->party_id);
+	item = kore_json_create_integer(result, "amount", t->amount);
+	item = kore_json_create_integer(result, "type", t->type);
+	item = kore_json_create_string(result, "desc", t->desc);
 
-
-}
-
-void txn_struct_to_korejson(struct txn *t, struct kore_json *json)
-{
-	struct kore_json_item *item;
-	json->root = kore_json_create_object(NULL, NULL);
-
-	item = kore_json_create_integer(json->root, "party_id", t->party_id);
-	item = kore_json_create_integer(json->root, "amount", t->amount);
-	item = kore_json_create_integer(json->root, "type", t->type);
-	item = kore_json_create_string(json->root, "desc", t->desc);
+	return result;
 }
 
 #endif
