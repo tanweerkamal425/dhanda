@@ -193,8 +193,57 @@ cleanup:
 }
 
 
+int
+api_txn_get(struct http_request *req)
+{
+	struct list *result;
+	txn_filter filter = {};
+	struct kore_json json = {};
+	struct kore_buf buf;
 
-struct kore_json_item *txn_struct_to_korejson(struct txn *t)
+	http_populate_get(req);
+
+	result = list_create(sizeof(struct txn));
+	txn_get(&app, filter, result);
+	json.root = txn_list_to_korejson(result);
+
+	kore_buf_init(&buf, 512);
+	kore_json_item_tobuf(json.root, &buf);
+
+	http_response(req, 200, buf.data, buf.offset);
+
+	return KORE_RESULT_OK;
+}
+
+
+struct kore_json_item *
+txn_list_to_korejson(struct list *transactions)
+{
+	Node *ptr;
+	struct txn *txn_ptr;
+	struct kore_json_item *root, *item, *array;
+
+	root = kore_json_create_object(NULL, NULL);
+
+	array = kore_json_create_array(root, "transactions");
+
+	ptr = transactions->head;
+
+	while (ptr) {
+		txn_ptr = (struct txn *) ptr->data;
+		item = txn_struct_to_korejson(txn_ptr);
+		kore_json_item_attach(array, item);
+
+		ptr = ptr->next;
+	}
+
+	return root;
+}
+
+
+
+struct kore_json_item *
+txn_struct_to_korejson(struct txn *t)
 {
 	struct kore_json_item *result, *item;
 	
