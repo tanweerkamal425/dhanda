@@ -39,6 +39,8 @@ api_party_add(struct http_request *req)
 		goto cleanup;
 	}
 
+
+
 	item = kore_json_find_string(json.root, "first_name");
 	strcpy(p.fname, item->data.string);
 
@@ -99,6 +101,64 @@ api_party_get(struct http_request *req)
 	return KORE_RESULT_OK;
 
 }
+
+
+
+int
+api_party_update(struct http_request *req)
+{
+	struct kore_json json;
+	struct kore_json_item *item;
+	struct party result = {};
+	struct party p = {};
+	int id;
+
+
+	kore_json_init(&json, req->http_body->data, req->http_body->length);
+
+	if (!kore_json_parse(&json)) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	}
+
+	kore_apputil_extract_route_ids(req->path, &id);
+	if (party_findbyid(&app, id, &result) != 1) {
+		http_response(req, 400, NULL, 0);
+		return KORE_RESULT_ERROR;
+	}
+
+	p.id = id;
+	item = kore_json_find_string(json.root, "first_name");
+	strcpy(p.fname, item->data.string);
+	item = kore_json_find_string(json.root, "last_name");
+	strcpy(p.lname, item->data.string);
+	item = kore_json_find_string(json.root, "phone");
+	strcpy(p.phone, item->data.string);
+	item = kore_json_find_integer(json.root, "amount");
+	p.amount = (int) item->data.u64;
+
+	p.cat = result.cat;
+	time(&p.uat);
+	party_update(&app, NULL, &p);
+
+
+	struct kore_json_item *res_json;
+	struct kore_buf buf;
+	res_json = party_struct_to_korejson(&p);
+
+	kore_buf_init(&buf, 512);
+	kore_json_item_tobuf(res_json, &buf);
+
+	http_response(req, 200, buf.data, buf.offset);
+
+cleanup:
+	kore_json_cleanup(&json);
+	kore_json_item_free(res_json);
+
+	return KORE_RESULT_OK;
+}
+
+
 
 struct kore_json_item *
 party_list_to_korejson(struct list *parties)
