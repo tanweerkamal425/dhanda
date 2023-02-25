@@ -1,4 +1,7 @@
+#ifndef TERMINAL_APP
+
 #include <dhanda/kore_util.h>
+#include <dhanda/dhanda.h>
 
 
 int
@@ -35,3 +38,6 @@ kore_apputil_extract_route_ids(const char *path, ...)
 
 	return ret;
 }
+
+
+#endif
