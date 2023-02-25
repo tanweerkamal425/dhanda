@@ -160,6 +160,39 @@ cleanup:
 
 
 
+int
+api_party_delete(struct http_request *req)
+{
+	struct party result = {};
+	struct kore_json json;
+	struct kore_json_item *item;
+	int id;
+
+	http_populate_get(req);
+
+	kore_apputil_extract_route_ids(req->path, &id);
+	
+	if (party_findbyid(&app, id, &result) != 1) {
+		http_response(req, 400, NULL, 0);
+		return KORE_RESULT_ERROR;
+	}
+
+	party_delete(&app, &result);
+
+	struct kore_json_item *res_json;
+	struct kore_buf buf;
+
+	res_json = party_struct_to_korejson(&result);
+
+	kore_buf_init(&buf, 512);
+	kore_json_item_tobuf(res_json, &buf);
+
+	http_response(req, 200, NULL, 0);
+
+	return KORE_RESULT_OK;
+}
+
+
 struct kore_json_item *
 party_list_to_korejson(struct list *parties)
 {
