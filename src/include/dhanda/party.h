@@ -30,6 +30,7 @@ int party_search(dhanda *app, char *query, struct list *result);
 int party_get(dhanda *app, party_filter filter, struct list *result);
 int put_in_party_list(void *ptr, int ncols, char **values, char **fields);
 int put_in_party_struct(void *ptr, int ncols, char **values, char **fields);
+int party_update_amount(struct dhanda *app, int pid, int val, int type);
 
 /* Handy functions for passing data from Data layer to UI layer, since
  * UI functions only takes one argument and are called using callback

@@ -171,6 +171,7 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 	return 1;
 }
 
+
 int put_in_party_struct(void *ptr, int ncols, char **values, char **fields)
 {
 	party *temp = (party *) ptr;
@@ -245,5 +246,28 @@ int party_update(dhanda *app, party *old_party, struct party *new_party) /*retur
 	
 	return 0;
  }
+
+
+ int party_update_amount(struct dhanda *app, int pid, int val, int type)
+{
+	struct party p = {};
+	int ret, sign = -1;
+	char *err = NULL;
+	char sql[1024];
+
+	if (type == 1) {
+		val *= sign;
+	}
+
+	sprintf(sql, "UPDATE parties SET amount = amount + %d WHERE id = %d", val, pid);
+
+	ret = sqlite3_exec(app->db, sql, NULL, NULL, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+
+	return 0;
+}
 
 
