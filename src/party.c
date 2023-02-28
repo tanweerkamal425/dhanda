@@ -255,7 +255,7 @@ int party_update(dhanda *app, party *old_party, struct party *new_party) /*retur
 	char *err = NULL;
 	char sql[1024];
 
-	if (type == 1) {
+	if (type == 0) {
 		val *= sign;
 	}
 
