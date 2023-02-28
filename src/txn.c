@@ -51,6 +51,8 @@ int txn_add(dhanda *app, txn *txn)
 	char *err = NULL;
 	int ret;
 
+	party_update_amount(app, txn->party_id, txn->amount, txn->type);
+
 	char *cat = created_time(txn->cat);
 
 	sprintf(sql, "INSERT INTO transactions(amount, created_at, type, desc, party_id) VALUES(%d, '%s', %d, '%s', %d)", txn->amount, 

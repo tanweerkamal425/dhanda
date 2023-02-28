@@ -1,5 +1,4 @@
 #include <dhanda/dhanda.h>
-#include <dhanda/party.h>
 #include <dhanda/txn.h>
 #include <dhanda/ui.h>
 
@@ -40,8 +39,6 @@ void ui_txn_create(struct dhanda *app)
 	printf("\n");
 
 	time(&t.cat);
-
-	party_update_amount(app, t.party_id, t.amount, t.type);
 
 	txn_insert_in_list(app, &t);
 	puts("");
