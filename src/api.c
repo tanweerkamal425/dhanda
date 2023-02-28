@@ -177,15 +177,16 @@ api_party_delete(struct http_request *req)
 		return KORE_RESULT_ERROR;
 	}
 
+	txn_delete(&app, result.id);
 	party_delete(&app, &result);
 
-	struct kore_json_item *res_json;
-	struct kore_buf buf;
+	// struct kore_json_item *res_json;
+	// struct kore_buf buf;
 
-	res_json = party_struct_to_korejson(&result);
+	// res_json = party_struct_to_korejson(&result);
 
-	kore_buf_init(&buf, 512);
-	kore_json_item_tobuf(res_json, &buf);
+	// kore_buf_init(&buf, 512);
+	// kore_json_item_tobuf(res_json, &buf);
 
 	http_response(req, 200, NULL, 0);
 
