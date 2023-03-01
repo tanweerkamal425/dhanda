@@ -7,6 +7,7 @@
 #include <dhanda/party.h>
 #include <dhanda/txn.h>
 #include <dhanda/api.h>
+#include <dhanda/kore_util.h>
 
 #include <kore/seccomp.h>
 
@@ -82,12 +83,24 @@ cleanup:
 int
 api_party_get(struct http_request *req)
 {
+	int ret, page, items;
 	struct list *result;
 	party_filter filter = {};
 	struct kore_json json = {};
 	struct kore_buf buf;
+	char *ptr;
+	int err = 0;
 
 	http_populate_get(req);
+
+	ret = http_argument_get_uint32(req, "page", &page);
+	if (!ret) page = 1;
+
+	ret = http_argument_get_uint32(req, "items", &items);
+	if (!ret) items = 50;
+
+	filter.page = page;
+	filter.items = items;
 
 	result = list_create(sizeof(struct party));
 	party_get(&app, filter, result);
@@ -96,6 +109,7 @@ api_party_get(struct http_request *req)
 	kore_buf_init(&buf, 512);
 	kore_json_item_tobuf(json.root, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
 
 	return KORE_RESULT_OK;

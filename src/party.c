@@ -153,8 +153,10 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 	int ret;
 	char *err = NULL;
 	char sql[1024];
+	int offset;
 
-	sprintf(sql, "SELECT * FROM parties");
+	offset = (filter.page - 1) * filter.items;
+	sprintf(sql, "SELECT * FROM parties ORDER BY id DESC LIMIT %d OFFSET %d", filter.items, offset);
 
 	ret = sqlite3_exec(app->db, sql, put_in_party_list, (void *) result, &err);
 	if (ret != SQLITE_OK) {
