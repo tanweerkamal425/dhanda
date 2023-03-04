@@ -133,7 +133,7 @@ api_party_show(struct http_request *req)
 		http_response(req, 400, NULL, 0);
 		return KORE_RESULT_ERROR;
 	}
-	
+
 
 	struct kore_json_item *res_json;
 	struct kore_buf buf;
@@ -337,12 +337,24 @@ cleanup:
 int
 api_txn_get(struct http_request *req)
 {
+	int ret, page, items;
 	struct list *result;
 	txn_filter filter = {};
 	struct kore_json json = {};
 	struct kore_buf buf;
+	char *ptr;
+	int err = 0;
 
 	http_populate_get(req);
+
+	ret = http_argument_get_uint32(req, "page", &page);
+	if (!ret) page = 1;
+
+	ret = http_argument_get_uint32(req, "items", &items);
+	if (!ret) items = 50;
+
+	filter.page = page;
+	filter.items = items;
 
 	result = list_create(sizeof(struct txn));
 	txn_get(&app, filter, result);
@@ -351,6 +363,7 @@ api_txn_get(struct http_request *req)
 	kore_buf_init(&buf, 512);
 	kore_json_item_tobuf(json.root, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
 
 	return KORE_RESULT_OK;

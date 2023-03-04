@@ -172,8 +172,11 @@ int txn_get(dhanda *app, txn_filter filter, struct list *result)
 	int ret;
 	char *err = NULL;
 	char sql[1024];
+	int offset;
 
-	sprintf(sql, "SELECT * FROM transactions");
+	offset = (filter.page - 1) * filter.items;
+
+	sprintf(sql, "SELECT * FROM transactions ORDER BY id DESC LIMIT %d OFFSET %d", filter.items, offset);
 
 	ret = sqlite3_exec(app->db, sql, put_in_txn_list, (void *) result, &err);
 	if (ret != SQLITE_OK) {
