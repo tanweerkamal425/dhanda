@@ -1,5 +1,6 @@
 dhanda
 !dhanda/
-
+dhanda.so
+kore.pid
 .*
 !.gitignore
