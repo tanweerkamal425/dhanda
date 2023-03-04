@@ -17,7 +17,8 @@ typedef struct party {
 typedef struct party_filter {
 	int page;
 	int items;
-	// @TODO
+	char *query;
+	int has_query;
 } party_filter;
 
 

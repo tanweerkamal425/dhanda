@@ -152,11 +152,20 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 {
 	int ret;
 	char *err = NULL;
-	char sql[1024];
+	char sql[1024], where_query[512];
 	int offset;
 
+	where_query[0] = '\0';
+	if (filter.has_query) {
+		sprintf(where_query,
+				"WHERE first_name LIKE '%%%s%%' OR "
+				"last_name LIKE '%%%s%%' OR "
+				"phone LIKE '%%%s%%'",
+				filter.query, filter.query, filter.query);
+	}
+
 	offset = (filter.page - 1) * filter.items;
-	sprintf(sql, "SELECT * FROM parties ORDER BY id DESC LIMIT %d OFFSET %d", filter.items, offset);
+	sprintf(sql, "SELECT * FROM parties %s ORDER BY id DESC LIMIT %d OFFSET %d", where_query, filter.items, offset);
 
 	ret = sqlite3_exec(app->db, sql, put_in_party_list, (void *) result, &err);
 	if (ret != SQLITE_OK) {

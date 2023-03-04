@@ -99,6 +99,12 @@ api_party_get(struct http_request *req)
 	ret = http_argument_get_uint32(req, "items", &items);
 	if (!ret) items = 50;
 
+	ret = http_argument_get_string(req, "query", &ptr);
+	if (ret) {
+		filter.query = ptr;
+		filter.has_query = 1;
+	}
+
 	filter.page = page;
 	filter.items = items;
 
@@ -148,45 +154,6 @@ api_party_show(struct http_request *req)
 	return KORE_RESULT_OK;
 
 }
-
-
-int
-api_party_search(struct http_request *req)
-{
-	struct kore_json json;
-	struct kore_json_item *item;
-	struct party result = {};
-	int ret;
-	char *query;
-
-	http_populate_get(req);
-
-	ret = http_argument_get_string(req, "query", &query);
-	if (!ret) {
-		http_response(req, 400, NULL, 0);
-		return KORE_RESULT_ERROR;
-	}
-
-	if (party_search(&app, query, &result) != 1) {
-		http_response(req, 404, NULL, 0);
-		return KORE_RESULT_ERROR;
-	}
-
-	struct kore_json_item *res_json;
-	struct kore_buf buf;
-	res_json = party_struct_to_korejson(&result);
-
-	kore_buf_init(&buf, 512);
-	kore_json_item_tobuf(res_json, &buf);
-
-	http_response(req, 200, buf.data, buf.offset);
-
-	return KORE_RESULT_OK;
-
-}
-
-
-
 
 
 
