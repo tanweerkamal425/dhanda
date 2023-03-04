@@ -3,6 +3,7 @@
 
 int api_party_add(struct http_request *req);
 int api_party_get(struct http_request *req);
+int api_party_show(struct http_request *req);
 int api_party_update(struct http_request *req);
 int api_party_delete(struct http_request *req);
 struct kore_json_item *party_struct_to_korejson(struct party *p);
