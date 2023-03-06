@@ -402,6 +402,40 @@ api_txn_get(struct http_request *req)
 }
 
 
+int
+api_txn_show(struct http_request *req)
+{
+	struct kore_json json;
+	struct kore_json_item *item;
+	struct txn result = {};
+	int id, ret;
+	int page, items;
+	char *ptr = NULL;
+
+	http_populate_get(req);
+
+	kore_apputil_extract_route_ids(req->path, &id);
+	
+	if (txn_findbyid(&app, id, &result) != 1) {
+		http_response(req, 400, NULL, 0);
+		return KORE_RESULT_ERROR;
+	}
+
+
+	struct kore_json_item *res_json;
+	struct kore_buf buf;
+	res_json = txn_struct_to_korejson(&result);
+
+	kore_buf_init(&buf, 1024);
+	kore_json_item_tobuf(res_json, &buf);
+
+	http_response(req, 200, buf.data, buf.offset);
+
+
+	return KORE_RESULT_OK;
+}
+
+
 struct kore_json_item *
 txn_list_to_korejson(struct list *transactions)
 {
