@@ -194,6 +194,34 @@ int txn_get(dhanda *app, txn_filter filter, struct list *result)
 }
 
 
+
+int txn_findby_pid(dhanda *app, txn_filter filter, int pid, struct list *result)
+{
+	int ret;
+	char sql[1024];
+	char *err = NULL;
+
+	int offset = (filter.page - 1) * filter.items;
+	sprintf(sql, "SELECT * FROM transactions WHERE party_id = %d", pid);
+
+	ret = sqlite3_exec(app->db, sql, put_in_txn_list, (void *) result, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+
+	if (result->head == NULL) {
+		app_error_set(app, "Transaction not found");
+		return 0;
+	}
+
+	app_success_set(app, "Transaction found");
+	return 1;
+	
+}
+
+
+
 int put_in_txn_struct(void *ptr, int ncols, char **values, char **fields)
 {
 	txn *temp = (txn *) ptr;
@@ -207,6 +235,7 @@ int put_in_txn_struct(void *ptr, int ncols, char **values, char **fields)
 
 	return SQLITE_OK;
 }
+
 
 int put_in_txn_list(void *ptr, int ncols, char **values, char **fields)
 {
