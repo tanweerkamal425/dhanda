@@ -19,6 +19,8 @@ typedef struct txn_stat {
 typedef struct txn_filter {
 	int page;
 	int items;
+	int type;
+	int is_found;
 } txn_filter;
 
 int txn_init(dhanda *app);

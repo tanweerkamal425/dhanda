@@ -171,12 +171,17 @@ int txn_get(dhanda *app, txn_filter filter, struct list *result)
 {
 	int ret;
 	char *err = NULL;
-	char sql[1024];
+	char sql[1024], type_query[128] = {'\0'};
 	int offset;
+
+	if (filter.is_found == 1) {
+		sprintf(type_query, "WHERE type = %d", filter.type);
+	}
+	
 
 	offset = (filter.page - 1) * filter.items;
 
-	sprintf(sql, "SELECT * FROM transactions ORDER BY id DESC LIMIT %d OFFSET %d", filter.items, offset);
+	sprintf(sql, "SELECT * FROM transactions %s ORDER BY id DESC LIMIT %d OFFSET %d", type_query, filter.items, offset);
 
 	ret = sqlite3_exec(app->db, sql, put_in_txn_list, (void *) result, &err);
 	if (ret != SQLITE_OK) {

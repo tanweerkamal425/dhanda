@@ -372,7 +372,7 @@ cleanup:
 int
 api_txn_get(struct http_request *req)
 {
-	int ret, page, items;
+	int ret, page, items, type;
 	struct list *result;
 	txn_filter filter = {};
 	struct kore_json json = {};
@@ -387,6 +387,12 @@ api_txn_get(struct http_request *req)
 
 	ret = http_argument_get_uint32(req, "items", &items);
 	if (!ret) items = 50;
+
+	ret = http_argument_get_uint32(req, "type", &type);
+	if (ret) {
+		filter.type = type;
+		filter.is_found = 1;
+	}
 
 	filter.page = page;
 	filter.items = items;
