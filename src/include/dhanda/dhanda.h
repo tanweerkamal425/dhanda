@@ -17,6 +17,7 @@
 #include <regex.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <limits.h>
 
 
 #include <dhanda/list.h>
