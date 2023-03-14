@@ -289,6 +289,15 @@ int validate_phone(char *str) {
 		return 0;
 	}
 
+	int validate_amount_int(int x)
+	{
+		if (x >= INT_MIN && x <= INT_MAX) {
+			return 0;
+		}
+
+		return -1;
+	}
+
 	void title_case(char *str)
 	{
 		unispace_separate(str);

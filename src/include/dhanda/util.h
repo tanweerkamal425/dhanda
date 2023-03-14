@@ -52,6 +52,7 @@ void centreprint(char *s);
 int validate_name(char *str);
 int validate_phone(char *str);
 int validate_amount(char *str);
+int validate_amount_int(int x);
 void input_valid_string(char *in, size_t size, int (*validator)(char *));
 void input_amount(int *in, int (*validator)(char *));
 void title_case(char *str);
