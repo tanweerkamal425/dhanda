@@ -265,19 +265,29 @@ api_party_delete(struct http_request *req)
 	struct party result = {};
 	struct kore_json json;
 	struct kore_json_item *item;
-	int id;
+	int id, ret;
 
 	http_populate_get(req);
 
 	kore_apputil_extract_route_ids(req->path, &id);
+
+	ret = party_findbyid(&app, id, &result);
 	
-	if (party_findbyid(&app, id, &result) != 1) {
+	if (ret == -1) {
 		http_response(req, 400, NULL, 0);
-		return KORE_RESULT_ERROR;
+	} else if(ret == 0) {
+		http_response(req, 404, NULL, 0);
 	}
 
-	txn_delete(&app, result.id);
-	party_delete(&app, &result);
+	ret = txn_delete(&app, result.id);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+	}
+	
+	ret = party_delete(&app, &result);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+	}
 
 	// struct kore_json_item *res_json;
 	// struct kore_buf buf;
