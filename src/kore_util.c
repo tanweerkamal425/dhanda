@@ -40,4 +40,48 @@ kore_apputil_extract_route_ids(const char *path, ...)
 }
 
 
+int
+util_http_json_error_response(struct http_request *req, struct kore_json_item *item, const char *field, int (*validator)(char *))
+{
+	int ret;
+	struct kore_json_item *err_item;
+	struct kore_buf buf;
+	char msg[1024];
+
+	if (item) {
+		if (item->type == KORE_JSON_TYPE_STRING) {
+			ret = validator(item->data.string);
+		} else if (item->type == KORE_JSON_TYPE_INTEGER) {
+			ret = validator((int) item->data.u64);
+		}
+
+		if (ret == 0) {
+			return 0;
+		}
+	}
+
+	ret = -1;
+	if (item == NULL) {
+		sprintf(msg, "%s is required", field);
+	} else {
+		sprintf(msg, "%s is invalid", field);
+	}
+
+	err_item = kore_json_create_object(NULL, NULL);
+
+	kore_json_create_string(err_item, "msg", msg);
+
+	kore_buf_init(&buf, 128);
+	kore_json_item_tobuf(err_item, &buf);
+
+	http_response_header(req, "content-type", "application/json");
+	http_response(req, 400, buf.data, buf.offset);
+
+	kore_buf_cleanup(&buf);
+	kore_json_item_free(err_item);
+
+	return ret;
+}
+
+
 #endif

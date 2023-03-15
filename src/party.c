@@ -70,6 +70,36 @@ int party_add(dhanda *app, party *party)
 
 }
 
+// int validate_phone(dhanda *app, char *str)
+// {
+// 	//regular expression
+// 	char *pattern = "^[1-9][0-9]{9}$";
+// 	char buf[1024];
+// 	int ret;
+// 	char *err = NULL;
+// 	int is_found = 0;
+
+// 	regex_t rgx;
+
+// 	if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+// 		// regerror(err, &rgx, buf, sizeof(buf));
+// 		// printf("%s\n", buf);
+// 		return -1;
+// 	}
+
+// 	if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+// 		return -1;
+// 	}
+
+// 	sprintf(buf, "SELECT * FROM parties WHERE phone = %s", str);
+// 	err = sqlite3_exec(app->db, buf, check_func_call, (void *) &is_found, &err);
+// 	if (is_found == 1) {
+// 		return -1;
+// 	}
+
+// 	return 0;
+// }
+
 
 int party_delete(dhanda *app, party *party)	/*returns 1 for success*/
 {											/*returns -1 for failure*/

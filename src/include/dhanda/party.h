@@ -33,6 +33,8 @@ int put_in_party_list(void *ptr, int ncols, char **values, char **fields);
 int put_in_party_struct(void *ptr, int ncols, char **values, char **fields);
 int party_update_amount(struct dhanda *app, int pid, int val, int type);
 
+//int validate_phone(dhanda *app, char *str);
+
 /* Handy functions for passing data from Data layer to UI layer, since
  * UI functions only takes one argument and are called using callback
  * there is no way to call a callback with different type/number of

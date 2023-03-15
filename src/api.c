@@ -29,8 +29,10 @@ init_app(void)
 int
 api_party_add(struct http_request *req)
 {
+	int ret;
 	struct kore_json json;
-	struct kore_json_item *item;
+	struct kore_json_item *item = NULL;
+	struct kore_json_item *res_json = NULL;
 	struct party p = {};
 
 	kore_json_init(&json, req->http_body->data, req->http_body->length);
@@ -43,23 +45,41 @@ api_party_add(struct http_request *req)
 
 
 	item = kore_json_find_string(json.root, "first_name");
+
+	ret = util_http_json_error_response(req, item, "first_name", validate_name);
+	if (ret == -1) goto cleanup;
+
 	strcpy(p.fname, item->data.string);
 
 	item = kore_json_find_string(json.root, "last_name");
+
+	ret = util_http_json_error_response(req, item, "last_name", validate_name);
+	if (ret == -1) goto cleanup;
+
 	strcpy(p.lname, item->data.string);
 
 	item = kore_json_find_string(json.root, "phone");
+
+	ret = util_http_json_error_response(req, item, "phone", validate_phone);
+	if (ret == -1) goto cleanup;
+
 	strcpy(p.phone, item->data.string);
 
 	item = kore_json_find_integer(json.root, "amount");
+
+	ret = util_http_json_error_response(req, item, "amount", validate_amount_int);
+	if (ret == -1) goto cleanup;
+
 	p.amount = (int) item->data.u64;
 
 	time(&p.cat);
 	time(&p.uat);
 
-	party_add(&app, &p);
+	ret = party_add(&app, &p);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+	}
 
-	struct kore_json_item *res_json;
 	struct kore_buf buf;
 	res_json = party_struct_to_korejson(&p);
 
@@ -76,7 +96,7 @@ api_party_add(struct http_request *req)
 
 cleanup:
 	kore_json_cleanup(&json);
-	kore_json_item_free(res_json);
+	if (res_json)	kore_json_item_free(res_json);
 
 	return KORE_RESULT_OK;
 }
