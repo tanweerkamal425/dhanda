@@ -59,6 +59,9 @@ int party_add(dhanda *app, party *party)
 	ret = sqlite3_exec(app->db, sql, NULL, NULL, &err);
 	if (ret != SQLITE_OK) {
 		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		if (strstr(err, "phone")) {
+			strcpy(party->phone, "P must be Uq");
+		}
 		app_error_set(app, "Failed to add party");
 		return -1;
 	}

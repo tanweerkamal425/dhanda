@@ -53,6 +53,7 @@ int validate_name(char *str);
 int validate_phone(char *str);
 int validate_amount(char *str);
 int validate_amount_int(int x);
+int validate_desc(char *str);
 void input_valid_string(char *in, size_t size, int (*validator)(char *));
 void input_amount(int *in, int (*validator)(char *));
 void title_case(char *str);
@@ -61,8 +62,10 @@ void unispace_separate(char *str);
 
 void input_pid(dhanda *app, int *pid, int (*validator) (char *));
 int validate_pid(char *str);
+int validate_pid_int(int pid);
 void input_txn_type(int *type, int (*validator) (char *));
 int validate_type(char *str);
+int validate_type_int(int type);
 int check_func_call(void *ptr, int ncols, char **values, char **fields);
 char *created_time(time_t t);
 char *updated_time(time_t t);

@@ -45,31 +45,23 @@ api_party_add(struct http_request *req)
 
 
 	item = kore_json_find_string(json.root, "first_name");
-
 	ret = util_http_json_error_response(req, item, "first_name", validate_name);
 	if (ret == -1) goto cleanup;
-
 	strcpy(p.fname, item->data.string);
 
 	item = kore_json_find_string(json.root, "last_name");
-
 	ret = util_http_json_error_response(req, item, "last_name", validate_name);
 	if (ret == -1) goto cleanup;
-
 	strcpy(p.lname, item->data.string);
 
 	item = kore_json_find_string(json.root, "phone");
-
 	ret = util_http_json_error_response(req, item, "phone", validate_phone);
 	if (ret == -1) goto cleanup;
-
 	strcpy(p.phone, item->data.string);
 
 	item = kore_json_find_integer(json.root, "amount");
-
 	ret = util_http_json_error_response(req, item, "amount", validate_amount_int);
 	if (ret == -1) goto cleanup;
-
 	p.amount = (int) item->data.u64;
 
 	time(&p.cat);
@@ -77,7 +69,8 @@ api_party_add(struct http_request *req)
 
 	ret = party_add(&app, &p);
 	if (ret != 0) {
-		http_response(req, 400, NULL, 0);
+		util_http_response_msg(req, p.phone);
+		goto cleanup;
 	}
 
 	struct kore_buf buf;
@@ -131,7 +124,14 @@ api_party_get(struct http_request *req)
 	filter.items = items;
 
 	result = list_create(sizeof(struct party));
-	party_get(&app, filter, result);
+	ret = party_get(&app, filter, result);
+	if (ret == -1) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	} else if(ret == 0) {
+		http_response(req, 404, NULL, 0);
+		goto cleanup;
+	}
 	json.root = party_list_to_korejson(result);
 
 	kore_buf_init(&buf, 512);
@@ -139,6 +139,9 @@ api_party_get(struct http_request *req)
 
 	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
+
+cleanup:
+	kore_json_cleanup(&json);
 
 	return KORE_RESULT_OK;
 
@@ -148,10 +151,12 @@ api_party_get(struct http_request *req)
 int
 api_party_show(struct http_request *req)
 {
-	struct kore_json json;
-	struct kore_json_item *item;
+	struct kore_json json = {};
+	struct kore_json_item *item = NULL;
+	struct kore_json_item *res_json1 = NULL, *res_json2 = NULL;
 	struct party result = {};
 	struct list *txn_result;
+	txn_result->head = NULL;
 	txn_filter filter = {};
 	int id, ret;
 	int page, items;
@@ -161,9 +166,13 @@ api_party_show(struct http_request *req)
 
 	kore_apputil_extract_route_ids(req->path, &id);
 	
-	if (party_findbyid(&app, id, &result) != 1) {
+	ret = party_findbyid(&app, id, &result);
+	if (ret == -1) {
 		http_response(req, 400, NULL, 0);
-		return KORE_RESULT_ERROR;
+		goto cleanup;
+	} else if(ret == 0) {
+		http_response(req, 404, NULL, 0);
+		goto cleanup;
 	}
 
 	ret = http_argument_get_string(req, "includes", &ptr);
@@ -177,24 +186,30 @@ api_party_show(struct http_request *req)
 	filter.page = page;
 	filter.items = items;
 
-	txn_result = list_create(sizeof(struct txn));
+	res_json1 = party_struct_to_korejson(&result);
+
 	if (ptr) {
+		txn_result = list_create(sizeof(struct txn));
 		ret = txn_findby_pid(&app, filter, id, txn_result);
+		if (ret == -1) {
+			http_response(req, 400, NULL, 0);
+			goto cleanup;
+		}
+		res_json2 = txn_list_to_korejson(txn_result);
+		struct kore_json_item *temp = kore_json_find_array(res_json2, "transactions");
+		kore_json_item_attach(res_json1, temp);
 	}
 
-
-	struct kore_json_item *res_json1, *res_json2;
 	struct kore_buf buf;
-	res_json1 = party_struct_to_korejson(&result);
-	res_json2 = txn_list_to_korejson(txn_result);
-	struct kore_json_item *temp = kore_json_find_array(res_json2, "transactions");
-	kore_json_item_attach(res_json1, temp);
-
 
 	kore_buf_init(&buf, 1024);
 	kore_json_item_tobuf(res_json1, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
+
+cleanup:
+	kore_json_cleanup(&json);
 
 
 	return KORE_RESULT_OK;
@@ -210,7 +225,7 @@ api_party_update(struct http_request *req)
 	struct kore_json_item *item;
 	struct party result = {};
 	struct party p = {};
-	int id;
+	int id, ret;
 
 
 	kore_json_init(&json, req->http_body->data, req->http_body->length);
@@ -221,24 +236,45 @@ api_party_update(struct http_request *req)
 	}
 
 	kore_apputil_extract_route_ids(req->path, &id);
-	if (party_findbyid(&app, id, &result) != 1) {
+
+	ret = party_findbyid(&app, id, &result);
+	if (ret == -1) {
 		http_response(req, 400, NULL, 0);
-		return KORE_RESULT_ERROR;
+		goto cleanup;
+	} else if(ret == 0) {
+		http_response(req, 404, NULL, 0);
+		goto cleanup;
 	}
 
 	p.id = id;
+
 	item = kore_json_find_string(json.root, "first_name");
+	ret = util_http_json_error_response(req, item, "first_name", validate_name);
+	if (ret == -1) goto cleanup;
 	strcpy(p.fname, item->data.string);
+
 	item = kore_json_find_string(json.root, "last_name");
+	ret = util_http_json_error_response(req, item, "last_name", validate_name);
+	if (ret == -1) goto cleanup;
 	strcpy(p.lname, item->data.string);
+
 	item = kore_json_find_string(json.root, "phone");
+	ret = util_http_json_error_response(req, item, "phone", validate_phone);
+	if (ret == -1) goto cleanup;
 	strcpy(p.phone, item->data.string);
+
 	item = kore_json_find_integer(json.root, "amount");
+	ret = util_http_json_error_response(req, item, "amount", validate_amount_int);
+	if (ret == -1) goto cleanup;
 	p.amount = (int) item->data.u64;
 
 	p.cat = result.cat;
 	time(&p.uat);
-	party_update(&app, NULL, &p);
+	ret = party_update(&app, NULL, &p);
+	if (ret == -1) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	}
 
 
 	struct kore_json_item *res_json;
@@ -248,11 +284,12 @@ api_party_update(struct http_request *req)
 	kore_buf_init(&buf, 512);
 	kore_json_item_tobuf(res_json, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
 
 cleanup:
 	kore_json_cleanup(&json);
-	kore_json_item_free(res_json);
+	if (res_json) kore_json_item_free(res_json);
 
 	return KORE_RESULT_OK;
 }
@@ -263,7 +300,7 @@ int
 api_party_delete(struct http_request *req)
 {
 	struct party result = {};
-	struct kore_json json;
+	struct kore_json json = {};
 	struct kore_json_item *item;
 	int id, ret;
 
@@ -275,18 +312,22 @@ api_party_delete(struct http_request *req)
 	
 	if (ret == -1) {
 		http_response(req, 400, NULL, 0);
+		goto cleanup;
 	} else if(ret == 0) {
 		http_response(req, 404, NULL, 0);
+		goto cleanup;
 	}
 
 	ret = txn_delete(&app, result.id);
 	if (ret != 0) {
 		http_response(req, 400, NULL, 0);
+		goto cleanup;
 	}
 	
 	ret = party_delete(&app, &result);
 	if (ret != 0) {
 		http_response(req, 400, NULL, 0);
+		goto cleanup;
 	}
 
 	// struct kore_json_item *res_json;
@@ -297,7 +338,11 @@ api_party_delete(struct http_request *req)
 	// kore_buf_init(&buf, 512);
 	// kore_json_item_tobuf(res_json, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, NULL, 0);
+
+cleanup:
+	kore_json_cleanup(&json);
 
 	return KORE_RESULT_OK;
 }
@@ -355,8 +400,10 @@ int
 api_txn_add(struct http_request *req)
 {
 	struct kore_json json;
-	struct kore_json_item *item;
+	struct kore_json_item *item = NULL;
+	struct kore_json_item *res_json = NULL;
 	struct txn t = {};
+	int ret;
 
 	kore_json_init(&json, req->http_body->data, req->http_body->length);
 
@@ -366,34 +413,47 @@ api_txn_add(struct http_request *req)
 	}
 
 	item = kore_json_find_integer(json.root, "party_id");
+	ret = util_http_json_error_response(req, item, "party_id", validate_pid_int);
+	if (ret == -1) goto cleanup;
 	t.party_id = (int) item->data.u64;
 
 	item = kore_json_find_integer(json.root, "amount");
+	ret = util_http_json_error_response(req, item, "amount", validate_amount_int);
+	if (ret == -1) goto cleanup;
 	t.amount = (int) item->data.u64;
 
 	item = kore_json_find_integer(json.root, "type");
+	ret = util_http_json_error_response(req, item, "type", validate_type_int);
+	if (ret == -1) goto cleanup;
 	t.type = (int) item->data.u64;
 
 	item = kore_json_find_string(json.root, "desc");
+	ret = util_http_json_error_response(req, item, "first_name", validate_desc);
+	if (ret == -1) goto cleanup;
 	strcpy(t.desc, item->data.string);
 
 	time(&t.cat);
 
-	txn_add(&app, &t);
+	ret = txn_add(&app, &t);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	}
 
-	struct kore_json_item *res_json;
+
 	struct kore_buf buf;
 	res_json = txn_struct_to_korejson(&t);
 
 	kore_buf_init(&buf, 512);
 	kore_json_item_tobuf(res_json, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 201, buf.data, buf.offset);
 
 
 cleanup:
 	kore_json_cleanup(&json);
-	kore_json_item_free(json.root);
+	if (res_json)	kore_json_item_free(res_json);
 
 	return KORE_RESULT_OK;
 }
@@ -428,7 +488,15 @@ api_txn_get(struct http_request *req)
 	filter.items = items;
 
 	result = list_create(sizeof(struct txn));
-	txn_get(&app, filter, result);
+	ret = txn_get(&app, filter, result);
+	if (ret == -1) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	} else if (ret == 0) {
+		http_response(req, 404, NULL, 0);
+		goto cleanup;
+	}
+
 	json.root = txn_list_to_korejson(result);
 
 	kore_buf_init(&buf, 512);
@@ -436,6 +504,9 @@ api_txn_get(struct http_request *req)
 
 	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
+
+cleanup:
+	kore_json_cleanup(&json);
 
 	return KORE_RESULT_OK;
 }
@@ -446,6 +517,7 @@ api_txn_show(struct http_request *req)
 {
 	struct kore_json json;
 	struct kore_json_item *item;
+	struct kore_json_item *res_json = NULL;
 	struct txn result = {};
 	int id, ret;
 	int page, items;
@@ -454,21 +526,29 @@ api_txn_show(struct http_request *req)
 	http_populate_get(req);
 
 	kore_apputil_extract_route_ids(req->path, &id);
-	
-	if (txn_findbyid(&app, id, &result) != 1) {
+
+
+	ret = txn_findbyid(&app, id, &result);
+	if (ret == -1) {
 		http_response(req, 400, NULL, 0);
-		return KORE_RESULT_ERROR;
+		goto cleanup;
+	} else if(ret == 0) {
+		http_response(req, 404, NULL, 0);
+		goto cleanup;
 	}
 
-
-	struct kore_json_item *res_json;
 	struct kore_buf buf;
 	res_json = txn_struct_to_korejson(&result);
 
 	kore_buf_init(&buf, 1024);
 	kore_json_item_tobuf(res_json, &buf);
 
+	http_response_header(req, "content-type", "application/json");
 	http_response(req, 200, buf.data, buf.offset);
+
+cleanup:
+	if (res_json) kore_json_item_free(res_json);
+	kore_json_cleanup(&json);
 
 
 	return KORE_RESULT_OK;

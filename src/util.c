@@ -383,6 +383,15 @@ int validate_phone(char *str) {
 		return 0;
 	}
 
+
+	int validate_pid_int(int pid) {
+		if (pid < 0 || pid > INT_MAX) {
+			return -1;
+		}
+
+		return 0;
+	}
+
 	void input_txn_type(int *type, int (*validator) (char *))
 	{
 		char t[10];
@@ -419,6 +428,37 @@ int validate_phone(char *str) {
 		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
 			return -1;
 		}	
+
+		return 0;
+	}
+
+
+	int validate_type_int(int type) {
+		if (type == 0 || type == 1) {
+			return 0;
+		}
+
+		return -1;
+	}
+
+
+	int validate_desc(char *str)
+	{
+		char *pattern = "^[a-zA-Z ]{2,1024}$";
+		char buf[1024];
+		int err;
+
+		regex_t rgx;
+
+		if ((err = regcomp(&rgx, pattern, REG_EXTENDED)) != 0) {
+			// regerror(err, &rgx, buf, sizeof(buf));
+			// printf("%s\n", buf);
+			return -1;
+		}
+
+		if (regexec(&rgx, str, 0, NULL, 0) == REG_NOMATCH) {
+			return -1;
+		}
 
 		return 0;
 	}

@@ -83,5 +83,33 @@ util_http_json_error_response(struct http_request *req, struct kore_json_item *i
 	return ret;
 }
 
+int
+util_http_response_msg(struct http_request *req, char *str)
+{
+	int ret;
+	char msg[1024];
+	struct kore_json_item *err_item;
+	struct kore_buf buf;
+
+
+	sprintf(msg, "error: %s", str);
+
+	err_item = kore_json_create_object(NULL, NULL);
+
+	kore_json_create_string(err_item, "msg", msg);
+
+	kore_buf_init(&buf, 128);
+	kore_json_item_tobuf(err_item, &buf);
+
+	http_response_header(req, "content-type", "application/json");
+	http_response(req, 400, buf.data, buf.offset);
+
+	kore_buf_cleanup(&buf);
+	kore_json_item_free(err_item);
+
+	return 0;
+
+}
+
 
 #endif
