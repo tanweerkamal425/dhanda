@@ -12,7 +12,9 @@
 #include <kore/seccomp.h>
 
 KORE_SECCOMP_FILTER("app",
-    KORE_SYSCALL_ALLOW(newfstatat), KORE_SYSCALL_ALLOW(fsync)
+    KORE_SYSCALL_ALLOW(newfstatat),
+    KORE_SYSCALL_ALLOW(fsync),
+    KORE_SYSCALL_ALLOW(mkdir)
 )
 
 
@@ -428,7 +430,7 @@ api_txn_add(struct http_request *req)
 	t.type = (int) item->data.u64;
 
 	item = kore_json_find_string(json.root, "desc");
-	ret = util_http_json_error_response(req, item, "first_name", validate_desc);
+	ret = util_http_json_error_response(req, item, "desc", validate_desc);
 	if (ret == -1) goto cleanup;
 	strcpy(t.desc, item->data.string);
 
@@ -515,7 +517,6 @@ cleanup:
 int
 api_txn_show(struct http_request *req)
 {
-	struct kore_json json;
 	struct kore_json_item *item;
 	struct kore_json_item *res_json = NULL;
 	struct txn result = {};
@@ -548,7 +549,6 @@ api_txn_show(struct http_request *req)
 
 cleanup:
 	if (res_json) kore_json_item_free(res_json);
-	kore_json_cleanup(&json);
 
 
 	return KORE_RESULT_OK;

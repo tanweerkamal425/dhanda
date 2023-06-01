@@ -35,7 +35,7 @@ void ui_txn_create(struct dhanda *app)
 	printf("\n");
 
 	printf("   DESC     : ");
-	get_line(t.desc, 256);
+	get_string(t.desc, 256);
 	printf("\n");
 
 	time(&t.cat);
