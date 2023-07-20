@@ -96,6 +96,64 @@ cleanup:
 	return KORE_RESULT_OK;
 }
 
+int
+api_stat_get(struct http_request *req)
+{
+	party_stat pstat;
+	txn_stat tstat = {};
+	struct list *result;
+
+	struct kore_json json = {};
+	struct kore_json_item *item = NULL;
+	struct kore_json_item *item2 = NULL;
+	struct kore_json_item *res_json = NULL;
+	struct kore_buf buf;
+
+	int c = 0, ret;
+
+	http_populate_get(req);
+
+	ret = party_stat_get(&app, &pstat);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	}
+	ret = txn_stat_get(&app, &tstat);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	}
+
+	result = list_create(sizeof(struct year_stat));
+	ret = txn_year_stat_get(&app, result);
+	if (ret != 0) {
+		http_response(req, 400, NULL, 0);
+		goto cleanup;
+	}
+
+
+
+	json.root = kore_json_create_object(NULL, NULL);
+	item = kore_json_create_integer(json.root, "total_party", pstat.party_count);
+	item = kore_json_create_integer(json.root, "total_txn", tstat.txn_count);
+	item = kore_json_create_integer(json.root, "balance_dr", tstat.balance_dr);
+	item = kore_json_create_integer(json.root, "balance_cr", tstat.balance_cr);
+
+	res_json = year_stat_list_to_korejson(result);
+	struct kore_json_item *temp = kore_json_find_array(res_json, "balance_bar_graph");
+	kore_json_item_attach(json.root, temp);
+
+	kore_buf_init(&buf, 128);
+	kore_json_item_tobuf(json.root, &buf); 
+
+	http_response_header(req, "content-type", "application/json");
+	http_response(req, 200, buf.data, buf.offset);
+
+cleanup:
+	kore_json_cleanup(&json);
+
+	return KORE_RESULT_OK;
+}
 
 int
 api_party_get(struct http_request *req)
@@ -129,9 +187,6 @@ api_party_get(struct http_request *req)
 	ret = party_get(&app, filter, result);
 	if (ret == -1) {
 		http_response(req, 400, NULL, 0);
-		goto cleanup;
-	} else if(ret == 0) {
-		http_response(req, 404, NULL, 0);
 		goto cleanup;
 	}
 	json.root = party_list_to_korejson(result);
@@ -596,6 +651,42 @@ txn_struct_to_korejson(struct txn *t)
 	item = kore_json_create_integer(result, "type", t->type);
 	item = kore_json_create_string(result, "created_at", cat);
 	item = kore_json_create_string(result, "desc", t->desc);
+
+	return result;
+}
+
+struct kore_json_item *
+year_stat_list_to_korejson(struct list *year_stat)
+{
+	Node *ptr;
+	struct year_stat *stat;
+	struct kore_json_item *root, *item, *array;
+
+	root = kore_json_create_object(NULL, NULL);
+	array = kore_json_create_array(root, "balance_bar_graph");
+
+	ptr = year_stat->head;
+
+	while (ptr) {
+		stat = (struct year_stat *) ptr->data;
+		item = year_stat_struct_to_korejson(stat);
+		kore_json_item_attach(array, item);
+
+		ptr = ptr->next;
+	}
+
+	return root;
+}
+
+struct kore_json_item *
+year_stat_struct_to_korejson(struct year_stat *stat)
+{
+	struct kore_json_item *result, *item;
+
+	result = kore_json_create_object(NULL, NULL);
+
+	item = kore_json_create_integer(result, "balance_cr", stat->balance_cr);
+	item = kore_json_create_integer(result, "balance_dr", stat->balance_dr);
 
 	return result;
 }

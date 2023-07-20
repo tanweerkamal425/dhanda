@@ -15,3 +15,7 @@ int api_txn_get(struct http_request *req);
 int api_txn_show(struct http_request *req);
 struct kore_json_item *txn_struct_to_korejson(struct txn *t);
 struct kore_json_item *txn_list_to_korejson(struct list *transactions);
+struct kore_json_item *year_stat_list_to_korejson(struct list *year_stat);
+struct kore_json_item *year_stat_struct_to_korejson(struct year_stat *year_stat);
+
+int api_stat_get(struct http_request *req);

@@ -14,6 +14,10 @@ typedef struct party {
 	int deletion_confirmed;
 } party;
 
+typedef struct party_stat {
+	int party_count;
+} party_stat;
+
 typedef struct party_filter {
 	int page;
 	int items;
@@ -32,6 +36,8 @@ int party_get(dhanda *app, party_filter filter, struct list *result);
 int put_in_party_list(void *ptr, int ncols, char **values, char **fields);
 int put_in_party_struct(void *ptr, int ncols, char **values, char **fields);
 int party_update_amount(struct dhanda *app, int pid, int val, int type);
+int party_stat_get(dhanda *app, party_stat *stat);
+int count_parties(void *ptr, int ncols, char **values, char **fields);
 
 //int validate_phone(dhanda *app, char *str);
 

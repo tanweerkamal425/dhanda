@@ -118,7 +118,7 @@ dhanda_init_app(struct dhanda *app)
 		perror("getpwuid error");
 		exit(EXIT_FAILURE);
 	}
-	fprintf(stderr, "OK1\n");
+	// fprintf(stderr, "OK1\n");
 	/* @DANGEROUS BUFFER OVERFLOW upto below */
 	strcpy(base_path, pw->pw_dir);
 	strcat(base_path, "/");

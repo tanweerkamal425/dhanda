@@ -215,6 +215,33 @@ int party_get(dhanda *app, party_filter filter, struct list *result)
 	return 1;
 }
 
+int party_stat_get(dhanda *app, party_stat *stat)
+{
+	int ret;
+	char *err = NULL;
+	char sql[1024], where_query[512];
+	int count = 0;
+
+	sprintf(sql, "SELECT COUNT(*) as party_count FROM parties");
+	ret = sqlite3_exec(app->db, sql, count_parties, (void *) &count, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+
+	stat->party_count = count;
+
+	return 0;
+
+}
+
+int count_parties(void *ptr, int ncols, char **values, char **fields)
+{
+	*((int *) ptr) = atoi(values[0]);
+
+	return SQLITE_OK;
+}
+
 
 int put_in_party_struct(void *ptr, int ncols, char **values, char **fields)
 {

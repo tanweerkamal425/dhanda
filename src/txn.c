@@ -225,6 +225,98 @@ int txn_findby_pid(dhanda *app, txn_filter filter, int pid, struct list *result)
 	
 }
 
+int txn_stat_get(dhanda *app, txn_stat *stat)
+{
+	int ret;
+	char *err = NULL;
+	char sql[1024], sql2[512];
+	int count = 0;
+	int debit = 0;
+	int credit = 0;
+
+	sprintf(sql, "SELECT COUNT(*) as txn_count FROM transactions");
+	ret = sqlite3_exec(app->db, sql, txn_count, (void *) &count, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+	sprintf(sql, "SELECT SUM(amount) from transactions WHERE type = 1");
+	ret = sqlite3_exec(app->db, sql, debit_sum, (void *) &debit, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+
+	sprintf(sql, "SELECT SUM(amount) from transactions WHERE type = 0");
+	ret = sqlite3_exec(app->db, sql, credit_sum, (void *) &credit, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+
+	stat->txn_count = count;
+	stat->balance_dr = debit;
+	stat->balance_cr = credit;
+
+	return 0;
+
+}
+
+int txn_year_stat_get(dhanda *app, struct list *result)
+{
+	int ret;
+	char *err = NULL;
+	char sql[1024], sql2[512];
+	int count = 0;
+	int debit = 0;
+	int credit = 0;
+
+	sprintf(sql, "SELECT strftime('%%m', created_at) AS month, SUM(CASE WHEN type = '0' THEN amount ELSE 0 END) AS credit_sum, SUM(CASE WHEN type = '1' THEN amount ELSE 0 END) AS debit_sum FROM transactions GROUP BY strftime('%%m', created_at) ORDER BY strftime('%%m', created_at)");
+	ret = sqlite3_exec(app->db, sql, balance_bar_graph, (void *) result, &err);
+	if (ret != SQLITE_OK) {
+		fprintf(stderr, "sqlite3_exec error: %s\n", err);
+		return -1;
+	}
+
+	return 0;
+}
+
+int balance_bar_graph(void *ptr, int ncols, char **values, char **fields)
+{
+	Node *node;
+	year_stat temp = {};
+
+	temp.balance_cr = atoi(values[1]);
+	temp.balance_dr = atoi(values[2]);
+
+	node = list_new_node((struct list *) ptr, (void *) &temp);
+	assert(node != NULL);
+	list_insert_end((struct list *) ptr, node);
+
+	return SQLITE_OK;
+}
+
+int txn_count(void *ptr, int ncols, char **values, char **fields)
+{
+	*((int *) ptr) = atoi(values[0]);
+
+	return SQLITE_OK;
+}
+
+
+int debit_sum(void *ptr, int ncols, char **values, char **fields)
+{
+	*((int *) ptr) = atoi(values[0]);
+
+	return SQLITE_OK;
+}
+
+int credit_sum(void *ptr, int ncols, char **values, char **fields)
+{
+	*((int *) ptr) = atoi(values[0]);
+
+	return SQLITE_OK;
+}
 
 
 int put_in_txn_struct(void *ptr, int ncols, char **values, char **fields)
